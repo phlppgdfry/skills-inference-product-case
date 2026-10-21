@@ -2535,9 +2535,7 @@
     "en": "Working in English, spoken and written.",
     "nl": "Werken in het Engels, mondeling en schriftelijk."
    },
-   "related": [
-    "dutch"
-   ]
+   "related": []
   },
   {
    "id": "dutch",
@@ -2559,10 +2557,7 @@
     "en": "Working in Dutch, spoken and written.",
     "nl": "Werken in het Nederlands, mondeling en schriftelijk."
    },
-   "related": [
-    "english",
-    "french"
-   ]
+   "related": []
   },
   {
    "id": "french",
@@ -2584,10 +2579,7 @@
     "en": "Working in French, spoken and written.",
     "nl": "Werken in het Frans, mondeling en schriftelijk."
    },
-   "related": [
-    "dutch",
-    "german"
-   ]
+   "related": []
   },
   {
    "id": "german",
@@ -2609,10 +2601,7 @@
     "en": "Working in German, spoken and written.",
     "nl": "Werken in het Duits, mondeling en schriftelijk."
    },
-   "related": [
-    "french",
-    "stakeholder-management"
-   ]
+   "related": []
   },
   {
    "id": "stakeholder-management",
@@ -2639,10 +2628,7 @@
     "en": "Keeping people with different interests informed, aligned and on board.",
     "nl": "Mensen met verschillende belangen geïnformeerd, op één lijn en betrokken houden."
    },
-   "related": [
-    "german",
-    "project-management"
-   ]
+   "related": []
   },
   {
    "id": "project-management",
@@ -2679,10 +2665,7 @@
     "en": "Planning work, tracking milestones and delivering projects on time and on budget.",
     "nl": "Werk plannen, mijlpalen opvolgen en projecten op tijd en binnen budget opleveren."
    },
-   "related": [
-    "stakeholder-management",
-    "agile"
-   ]
+   "related": []
   },
   {
    "id": "agile",
@@ -2719,10 +2702,7 @@
     "en": "Working in short iterations with a backlog, reviews and retrospectives.",
     "nl": "Werken in korte iteraties met een backlog, reviews en retrospectives."
    },
-   "related": [
-    "project-management",
-    "communication"
-   ]
+   "related": []
   },
   {
    "id": "communication",
@@ -2754,9 +2734,7 @@
     "en": "Expressing yourself clearly to colleagues, customers and management.",
     "nl": "Je helder uitdrukken tegenover collega's, klanten en management."
    },
-   "related": [
-    "agile"
-   ]
+   "related": []
   }
  ]
 }

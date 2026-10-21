@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    name: Tests, eval gate, build check (stdlib only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Lint
+        run: pip install ruff && ruff check .
+      - name: Data is reproducible
+        run: python scripts/make_data.py --check
+      - name: Unit, API and contract tests
+        run: python -m unittest discover -s tests -t . -v
+      - name: Eval gate
+        run: python -m evals.run --gate
+      - name: Model, reports, site data and doc numbers are up to date
+        run: python scripts/build.py --check
+      - name: Browser port matches Python
+        run: node tests/js/parity.mjs
+
+  ml:
+    name: PyTorch parity and Transformers evals
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-paraphrase-multilingual-MiniLM-L12-v2
+      - name: Install CPU PyTorch and Transformers
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install "transformers>=4.45" numpy
+      - name: PyTorch trainer matches the stdlib trainer
+        run: |
+          python -m unittest tests.test_torch_parity -v
+          python -m training.train_torch --check
+      - name: Transformers run matches the committed report
+        run: |
+          python -m skilldraft train --embedder hf
+          python -m evals.run --embedder hf --write
+          git show HEAD:evals/reports/offline.hf-paraphrase-multilingual-MiniLM-L12-v2.json > /tmp/committed.json
+          python scripts/compare_report.py /tmp/committed.json evals/reports/offline.hf-paraphrase-multilingual-MiniLM-L12-v2.json --tolerance 0.01
+
+  container:
+    name: Container builds and answers /healthz
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t skilldraft:ci .
+      - run: |
+          docker run -d --name api -p 8080:8080 skilldraft:ci
+          for i in $(seq 1 20); do curl -fsS localhost:8080/healthz && exit 0; sleep 1; done
+          docker logs api; exit 1

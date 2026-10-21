@@ -114,26 +114,31 @@ def train_logistic(X: Sequence[Sequence[float]], y: Sequence[int], l2: float = 1
     return w, b
 
 
-def pick_thresholds(probs: Sequence[float], labels: Sequence[int], positives: int,
-                    target_precision: float = 0.95, target_recall: float = 0.95) -> tuple[float, float]:
-    """accept_at: the lowest threshold whose accepted set reaches the precision target.
-    review_at: the highest threshold at which accepted + review still reach the recall target.
+def pick_thresholds(probs: Sequence[float], labels: Sequence[int], target_precision: float = 0.95,
+                    min_band_precision: float = 0.25) -> tuple[float, float]:
+    """accept_at: the lowest threshold whose accepted set still reaches the precision target.
+    review_at: the lowest threshold at which the review band [review_at, accept_at) still has
+    at least `min_band_precision` real skills in it.
 
-    `positives` counts every gold skill, including those that never became a candidate, so
-    recall is measured against the job descriptions and not against the candidates.
+    The second rule is a product rule, not a statistical one: a review item is a question to
+    a person. If fewer than one in four is a real skill, reviewers learn to click it away
+    (docs/07-stakeholders/trade-off-memo.md).
     """
     pairs = sorted(zip(probs, labels), reverse=True)
-    accept_at, review_at = 1.0, 1.0
+    accept_at = 1.0
     tp = fp = 0
-    best_recall_threshold = None
     for p, y in pairs:
         tp += y
         fp += 1 - y
         if tp / (tp + fp) >= target_precision:
             accept_at = p
-        if best_recall_threshold is None and tp / positives >= target_recall:
-            best_recall_threshold = p
-    review_at = best_recall_threshold if best_recall_threshold is not None else min(p for p, _ in pairs)
-    accept_at = round(accept_at, 3)
-    review_at = round(min(review_at, accept_at), 3)
-    return accept_at, max(review_at, 0.05)
+    review_at = accept_at
+    band_tp = band_n = 0
+    for p, y in pairs:
+        if p >= accept_at:
+            continue
+        band_tp += y
+        band_n += 1
+        if band_tp / band_n >= min_band_precision:
+            review_at = p
+    return round(accept_at, 3), round(min(review_at, accept_at), 3)

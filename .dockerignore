@@ -1,0 +1,7 @@
+.git
+site
+docs
+tests
+evals
+var
+__pycache__

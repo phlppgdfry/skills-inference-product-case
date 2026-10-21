@@ -1,5 +1,5 @@
 {
- "version": "scorer-86e2552a",
+ "version": "scorer-dcf5b308",
  "embedder": "hashing-v1",
  "features": [
   "exact_good",
@@ -29,7 +29,7 @@
  ],
  "bias": -1.729348,
  "accept_at": 0.425,
- "review_at": 0.05,
+ "review_at": 0.344,
  "l2": 0.001,
  "trained_on": "train split: dcf0085b5abc"
 }

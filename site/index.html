@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkillDraft case</title>
+<meta name="description" content="From an ambiguous HR ask to a shipped AI service: discovery, a measured prototype, a calibrated skills-inference API with evidence, and fairness evals. Fictional company.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="./">Skill<span>Draft</span></a>
+  <nav><a href="./" aria-current="page">Case</a><a href="demo/">Demo</a><a href="demo/?tour">Tour</a><a href="#evals">Evals</a></nav>
+</div></header>
+
+<main class="wrap">
+  <h1>From "can we use AI for this?" to a skills service people trust</h1>
+  <p class="lead">An AI product engineering case: the ask was vague, discovery made it concrete, a two-day spike measured four designs, and the one that shipped turns a job description into a draft skill profile. Every skill comes from a fixed taxonomy, points at its sentence and carries a calibrated confidence.</p>
+  <div class="row" style="margin-top:20px">
+    <a class="btn" href="demo/?tour">Take the 2-minute tour</a>
+    <a class="btn ghost" href="demo/">Open the demo</a>
+  </div>
+  <p class="note" style="margin-top:14px">Fictional setting: Orveda (HR-tech scale-up) and Haldane Group (industrial customer) are invented. Test data is generated; numbers come from the eval suite in the repository and are refreshed by the build.</p>
+
+  <h2>The result in four numbers</h2>
+  <div class="grid">
+    <div class="card"><div class="k">F1, spike → production</div><div class="big" style="font-size:28px"><!--n:A.f1-->0.515<!--/n--> → <!--n:D.f1-->0.958<!--/n--></div><div class="note">on <!--n:test.descriptions-->100<!--/n--> test job descriptions, EN and NL</div></div>
+    <div class="card"><div class="k">Precision of suggestions</div><div class="big"><!--n:D.precision-->0.963<!--/n--></div><div class="note">the accept threshold targets 95% on dev</div></div>
+    <div class="card"><div class="k">Skills only described, found</div><div class="big"><!--n:D.paraphrase_recall-->80%<!--/n--></div><div class="note">"you keep our workloads scaled across clusters"</div></div>
+    <div class="card"><div class="k">Profiles unchanged by he/she, name, age wording</div><div class="big"><!--n:invariance-->100%<!--/n--></div><div class="note">was 60% in the first eval run; fixed by design</div></div>
+  </div>
+
+  <h2>How the work went</h2>
+  <div class="grid steps">
+    <div class="card step"><h3>Discover</h3><p>Six interviews turned "profiles take forever and are wrong" into one problem: 1,400 role profiles, each written in the author's own words, with no way to see where a skill came from. Trust breaks on one absurd suggestion.</p></div>
+    <div class="card step"><h3>Prototype</h3><p>A two-day spike compared label matching, alias rules, a semantic matcher and a calibrated scorer. Most of the quality came from boring engineering: sections, negation, company voice.</p></div>
+    <div class="card step"><h3>Ship</h3><p>A deterministic service with an OpenAPI contract, evidence spans, a review band, a feedback loop, logs without text, metrics, and an optional Claude verifier on Bedrock that can only confirm candidates.</p></div>
+    <div class="card step"><h3>Measure</h3><p>Ten eval suites and a release gate in CI. The fairness suite caught a real problem the unit tests missed; the review-band metric caught a useless queue.</p></div>
+  </div>
+
+  <h2>What each design step bought</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Config</th><th>What it adds</th><th>Precision</th><th>Recall</th><th>F1</th><th>Described skills</th><th>Shortlist nDCG@5</th></tr></thead>
+    <tbody>
+      <tr><td>A</td><td>Skill label anywhere (the day-one hack)</td><td><!--n:A.precision-->0.892<!--/n--></td><td><!--n:A.recall-->0.362<!--/n--></td><td><!--n:A.f1-->0.515<!--/n--></td><td><!--n:A.paraphrase_recall-->0%<!--/n--></td><td><!--n:A.ndcg-->0.744<!--/n--></td></tr>
+      <tr><td>B</td><td>Bilingual aliases, sections, negation, company voice</td><td><!--n:B.precision-->1.000<!--/n--></td><td><!--n:B.recall-->0.762<!--/n--></td><td><!--n:B.f1-->0.865<!--/n--></td><td><!--n:B.paraphrase_recall-->0%<!--/n--></td><td><!--n:B.ndcg-->0.957<!--/n--></td></tr>
+      <tr><td>C</td><td>+ semantic matches, fixed threshold</td><td><!--n:C.precision-->0.929<!--/n--></td><td><!--n:C.recall-->0.928<!--/n--></td><td><!--n:C.f1-->0.929<!--/n--></td><td><!--n:C.paraphrase_recall-->69.5%<!--/n--></td><td><!--n:C.ndcg-->0.990<!--/n--></td></tr>
+      <tr class="hl"><td>D</td><td>+ calibrated scorer and review band (shipped)</td><td><!--n:D.precision-->0.963<!--/n--></td><td><!--n:D.recall-->0.953<!--/n--></td><td><!--n:D.f1-->0.958<!--/n--></td><td><!--n:D.paraphrase_recall-->80%<!--/n--></td><td><!--n:D.ndcg-->0.994<!--/n--></td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">The shortlist column ranks 60 fictional employees for each test role and compares the ranking with the one the gold profile would give. Better role profiles, better internal-mobility shortlists.</p>
+
+  <h2 id="evals">Evals</h2>
+  <p>Calibration: does a confidence of 0.8 mean the skill is right 8 times in 10? Each dot is a confidence bin of the <!--n:candidates-->1156<!--/n--> test candidates; the diagonal is perfect calibration. ECE <!--n:ece-->0.061<!--/n-->.</p>
+  <div class="card"><svg id="reliability" viewBox="0 0 520 300" role="img" aria-label="Reliability diagram" style="width:100%;height:auto"></svg></div>
+  <h3 style="margin-top:28px">Release gate and fairness</h3>
+  <div class="tablewrap"><table id="gate">
+    <thead><tr><th>Check</th><th>Result</th><th>Gate</th></tr></thead>
+    <tbody>
+      <tr><td>Counterfactual invariance (<!--n:variants-->400<!--/n--> variants)</td><td><!--n:invariance-->100%<!--/n--></td><td>100%</td></tr>
+      <tr><td>F1 English / Dutch</td><td><!--n:D.f1_en-->0.951<!--/n--> / <!--n:D.f1_nl-->0.971<!--/n--></td><td>gap ≤ 0.05</td></tr>
+      <tr><td>Skills from about-us / offer / "not needed" suggested</td><td><!--n:D.distractor.about-->3.5%<!--/n--> / <!--n:D.distractor.offer-->0%<!--/n--> / <!--n:D.distractor.negated-->2.6%<!--/n--></td><td>each ≤ 10%</td></tr>
+      <tr><td>Evidence points at the right sentence</td><td><!--n:D.evidence-->100%<!--/n--></td><td>≥ 98%</td></tr>
+      <tr><td>Required vs nice-to-have right</td><td><!--n:D.importance-->96.9%<!--/n--></td><td>≥ 93%</td></tr>
+      <tr><td>Coded-language checker: known phrases / all phrases / false alarms</td><td><!--n:checker.recall_known-->100%<!--/n--> / <!--n:checker.recall-->77.6%<!--/n--> / <!--n:checker.false_alarms-->0<!--/n--></td><td>100% / – / 0</td></tr>
+      <tr><td>Review items per description, share that are real skills</td><td><!--n:D.review_per_jd-->0.3<!--/n-->, <!--n:D.review_precision-->16.7%<!--/n--></td><td>band ≥ 25% real on dev</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 style="margin-top:28px">With a real sentence encoder</h3>
+  <p>The same suites with <code><!--n:hf.name-->paraphrase-multilingual-MiniLM-L12-v2<!--/n--></code> (Transformers, PyTorch): F1 <!--n:hf.D.f1-->0.936<!--/n-->, described skills <!--n:hf.D.paraphrase_recall-->66%<!--/n-->, EN/NL gap <!--n:hf.D.lang_gap-->0.051<!--/n-->. A generic encoder is not a skills encoder, and the hashing stand-in benefits from words shared between test sentences and taxonomy definitions. The next investment is a skills-specific encoder trained on reviewer feedback, measured on real labelled ads.</p>
+
+  <footer>
+    SkillDraft is a portfolio case with a fictional company and generated data. Code, docs and the evidence ledger (what is executed, simulated and not done) are in the repository.
+  </footer>
+</main>
+<script type="module">
+  const evals = await fetch("data/evals.json").then((r) => r.json());
+  const bins = evals.calibration.reliability;
+  const svg = document.getElementById("reliability");
+  const W = 520, H = 300, L = 46, B = 36, T = 12, R = 12;
+  const x = (v) => L + v * (W - L - R), y = (v) => H - B - v * (H - B - T);
+  const max = Math.max(...bins.map((b) => b.n));
+  let s = `<line x1="${x(0)}" y1="${y(0)}" x2="${x(1)}" y2="${y(1)}" stroke="currentColor" opacity="0.25" stroke-dasharray="4 4"/>`;
+  for (const t of [0, 0.25, 0.5, 0.75, 1]) {
+    s += `<text x="${x(t)}" y="${H - 14}" text-anchor="middle">${t}</text><text x="${L - 8}" y="${y(t) + 4}" text-anchor="end">${t}</text>`;
+    s += `<line x1="${x(0)}" x2="${x(1)}" y1="${y(t)}" y2="${y(t)}" stroke="currentColor" opacity="0.08"/>`;
+  }
+  s += `<text x="${(L + W) / 2}" y="${H - 1}" text-anchor="middle">mean confidence in bin</text>`;
+  s += `<text transform="translate(12 ${(H - B) / 2}) rotate(-90)" text-anchor="middle">share that is a real skill</text>`;
+  for (const b of bins) {
+    const r = 4 + 10 * Math.sqrt(b.n / max);
+    s += `<circle cx="${x(b.mean_confidence)}" cy="${y(b.observed)}" r="${r}" fill="var(--accent)" fill-opacity="0.75"><title>${b.bin}: ${b.n} candidates, confidence ${b.mean_confidence.toFixed(2)}, observed ${b.observed.toFixed(2)}</title></circle>`;
+  }
+  svg.innerHTML = s;
+  svg.style.color = getComputedStyle(document.body).color;
+</script>
+</body>
+</html>

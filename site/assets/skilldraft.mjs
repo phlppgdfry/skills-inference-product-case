@@ -353,7 +353,8 @@ export class Pipeline {
       }
     });
     for (const c of cands.values()) c.features = featureVector(c, hasHeadings, this.model.features);
-    return { text, sentences, hasHeadings, candidates: cands };
+    const excluded = new Set(sentences.filter((s) => !s.heading && !body.includes(s)).map((s) => s.index));
+    return { text, sentences, hasHeadings, candidates: cands, excluded };
   }
 
   infer(text) {
@@ -377,7 +378,7 @@ export class Pipeline {
     skills.sort((x, y) => (x.status !== "suggested") - (y.status !== "suggested") || (x.importance !== "required") - (y.importance !== "required")
       || y.confidence - x.confidence || (x.id < y.id ? -1 : x.id > y.id ? 1 : 0));
     const covered = new Set(skills.flatMap((s) => s.evidence.map((e) => e.sentence)));
-    const uncovered = a.sentences.filter((s) => !s.heading && ["req", "resp"].includes(s.section) && !covered.has(s.index) && !s.requirementNegated)
+    const uncovered = a.sentences.filter((s) => !s.heading && ["req", "resp"].includes(s.section) && !covered.has(s.index) && !s.requirementNegated && !a.excluded.has(s.index))
       .map((s) => ({ start: s.start, end: s.end, text: s.text }));
     return { skills, uncovered_requirements: uncovered, language_flags: checkLanguage(text),
       meta: { config: "D", taxonomy_version: this.taxonomy.version, embedder: this.embedder.name, model_version: m.version,

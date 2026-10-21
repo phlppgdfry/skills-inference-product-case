@@ -268,6 +268,8 @@ def taxonomy() -> dict:
         fam_list = by_family[fam]
         i = fam_list.index(sid)
         related = [s for s in (fam_list[i - 1] if i > 0 else None, fam_list[i + 1] if i + 1 < len(fam_list) else None) if s]
+        if fam == "cross":  # knowing English does not make Dutch "close to learn"
+            related = []
         skills.append({"id": sid, "label": label, "family": fam, "aliases": aliases,
                        "definition": {"en": d_en, "nl": d_nl}, "related": related})
     return {"version": TAXONOMY_VERSION, "skills": skills}

@@ -1,12 +1,12 @@
 {
  "embedder": "hf-paraphrase-multilingual-MiniLM-L12-v2",
- "model_version": "scorer-5be88cac",
+ "model_version": "scorer-cf4c6cc7",
  "taxonomy_version": "2026.10",
  "test_descriptions": 100,
  "gold_skills": 849,
  "thresholds": {
   "accept_at": 0.431,
-  "review_at": 0.05,
+  "review_at": 0.431,
   "config_C_similarity": 0.46
  },
  "configs": {
@@ -248,13 +248,13 @@
    "importance_accuracy": 0.9782,
    "evidence_accuracy": 0.9987,
    "review": {
-    "items": 144,
-    "per_description": 1.44,
-    "precision_in_band": 0.0417,
-    "recall_with_review": 0.927
+    "items": 0,
+    "per_description": 0.0,
+    "precision_in_band": 0.0,
+    "recall_with_review": 0.9199
    },
-   "missed_but_flagged_uncovered": 0.3548,
-   "missed": 62,
+   "missed_but_flagged_uncovered": 0.3235,
+   "missed": 68,
    "language_f1_gap": 0.0512,
    "match_ndcg_at_5": 0.9886
   }

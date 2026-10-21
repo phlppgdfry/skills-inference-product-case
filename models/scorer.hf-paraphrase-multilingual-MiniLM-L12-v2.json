@@ -1,5 +1,5 @@
 {
- "version": "scorer-5be88cac",
+ "version": "scorer-cf4c6cc7",
  "embedder": "hf-paraphrase-multilingual-MiniLM-L12-v2",
  "features": [
   "exact_good",
@@ -29,7 +29,7 @@
  ],
  "bias": -2.14885,
  "accept_at": 0.431,
- "review_at": 0.05,
+ "review_at": 0.431,
  "l2": 0.001,
  "trained_on": "train split: dcf0085b5abc"
 }

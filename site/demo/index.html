@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkillDraft demo</title>
+<meta name="description" content="Paste a job description and get a draft skill profile with evidence, confidence and coded-language flags. Runs in your browser.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../">Skill<span>Draft</span></a>
+  <nav><a href="../">Case</a><a href="./" aria-current="page">Demo</a><a href="./?tour">Tour</a><a href="../#evals">Evals</a></nav>
+</div></header>
+<main class="wrap">
+  <h1 style="font-size:32px;margin-top:28px">Draft a skill profile</h1>
+  <p class="note">The real pipeline (configuration D, model <code id="model">…</code>), ported to JavaScript and checked against Python on all 100 test descriptions. Nothing leaves your browser.</p>
+  <div class="row" style="margin-top:12px">
+    <label for="sample" class="note">Example</label>
+    <select id="sample"></select>
+    <div class="seg" role="group" aria-label="Configuration">
+      <button id="modeD" aria-pressed="true">Production (D)</button>
+      <button id="modeA" aria-pressed="false">Day-one spike (A)</button>
+    </div>
+  </div>
+  <div class="demo">
+    <section>
+      <textarea id="text" spellcheck="false" aria-label="Job description"></textarea>
+      <div class="legend">
+        <span><b style="background:var(--accent-soft);box-shadow:inset 0 -2px 0 var(--accent)"></b>alias match</span>
+        <span><b style="background:var(--sem-soft)"></b>described (semantic)</span>
+        <span><b style="background:var(--warn-soft);box-shadow:inset 0 -2px 0 var(--warn)"></b>please check</span>
+        <span><b style="background:var(--flag-soft);box-shadow:inset 0 -2px 0 var(--flag)"></b>coded wording</span>
+      </div>
+      <div id="doc" class="doc" aria-live="polite"></div>
+    </section>
+    <section>
+      <div id="summary" class="note"></div>
+      <div id="skills" class="skills" style="margin-top:8px"></div>
+      <div id="extra"></div>
+      <details style="margin-top:14px"><summary class="note">What your verdicts would send to <code>/v1/feedback</code></summary><pre id="feedback" class="doc" style="font-size:12px"></pre></details>
+    </section>
+  </div>
+</main>
+<div id="tour" class="tour" hidden></div>
+<script type="module">
+import { Pipeline, fold } from "../assets/skilldraft.mjs";
+
+const [taxonomy, model, samples] = await Promise.all(["taxonomy", "model", "samples"].map((n) => fetch(`../data/${n}.json`).then((r) => r.json())));
+const pipe = new Pipeline(taxonomy, model);
+const $ = (id) => document.getElementById(id);
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+let mode = "D", active = null, verdicts = {}, last = null, gold = null;
+$("model").textContent = model.version;
+
+for (const s of samples) $("sample").insertAdjacentHTML("beforeend", `<option value="${s.id}">${esc(s.title)} · ${s.lang.toUpperCase()}${s.gold ? " · test set" : ""}</option>`);
+function load(id) {
+  const s = samples.find((x) => x.id === id);
+  $("sample").value = id; $("text").value = s.text; gold = s.gold; verdicts = {}; active = null; run();
+}
+$("sample").onchange = (e) => load(e.target.value);
+let timer;
+$("text").oninput = () => { clearTimeout(timer); timer = setTimeout(() => { gold = null; run(); }, 150); };
+function setMode(m) { mode = m; $("modeD").setAttribute("aria-pressed", m === "D"); $("modeA").setAttribute("aria-pressed", m === "A"); run(); }
+$("modeD").onclick = () => setMode("D");
+$("modeA").onclick = () => setMode("A");
+
+function spike(text) {
+  const folded = fold(text), skills = [];
+  for (const s of taxonomy.skills) {
+    const label = fold(s.label);
+    let i = folded.indexOf(label);
+    while (i >= 0) {
+      const before = i > 0 ? folded[i - 1] : " ", after = folded[i + label.length] ?? " ";
+      if (!/[a-z0-9]/.test(before) && !/[a-z0-9]/.test(after)) {
+        skills.push({ id: s.id, label: s.label, status: "suggested", importance: "required", confidence: 1, evidence: [{ start: i, end: i + label.length, quote: text.slice(i, i + label.length), kind: "exact" }] });
+        break;
+      }
+      i = folded.indexOf(label, i + 1);
+    }
+  }
+  return { skills, uncovered_requirements: [], language_flags: [], meta: { config: "A", latency_ms: 0 } };
+}
+
+function run() {
+  const text = $("text").value;
+  const t0 = performance.now();
+  last = mode === "D" ? pipe.infer(text) : spike(text);
+  last.meta.latency_ms = Math.round((performance.now() - t0) * 10) / 10;
+  render(text, last);
+}
+
+function render(text, out) {
+  // highlight runs: one class per character (flag > exact > semantic), plus "active" for the selected skill
+  const cls = new Array(text.length).fill(""), act = new Array(text.length).fill(false);
+  const rank = { "": 0, semantic: 1, review: 2, exact: 3, flag: 4 };
+  const paint = (a, b, c, isActive) => { for (let i = a; i < b; i++) { if (rank[c] > rank[cls[i]]) cls[i] = c; if (isActive) act[i] = true; } };
+  for (const s of out.skills) for (const e of s.evidence) {
+    const c = e.kind === "semantic" ? "semantic" : s.status === "needs_review" ? "review" : "exact";
+    paint(e.start, e.end, c, s.id === active);
+  }
+  for (const f of out.language_flags) paint(f.start, f.end, "flag", false);
+  let html = "", i = 0;
+  while (i < text.length) {
+    let j = i;
+    while (j < text.length && cls[j] === cls[i] && act[j] === act[i]) j++;
+    const chunk = esc(text.slice(i, j));
+    html += cls[i] || act[i] ? `<mark class="${cls[i]}${act[i] ? " active" : ""}">${chunk}</mark>` : chunk;
+    i = j;
+  }
+  $("doc").innerHTML = html;
+
+  const goldIds = gold ? new Map(gold.map((g) => [g.id, g.importance])) : null;
+  const sugg = out.skills.filter((s) => s.status === "suggested").length, rev = out.skills.length - sugg;
+  $("summary").innerHTML = `${sugg} suggested${rev ? `, ${rev} to check` : ""} · ${out.meta.latency_ms} ms in your browser` +
+    (goldIds ? ` · test set: ${out.skills.filter((s) => s.status === "suggested" && goldIds.has(s.id)).length}/${goldIds.size} gold skills found` : "");
+  $("skills").innerHTML = out.skills.map((s) => {
+    const v = verdicts[s.id];
+    const g = goldIds ? (goldIds.has(s.id) ? " · ✓ in gold" : " · ✗ not in gold") : "";
+    const ev = s.evidence[0];
+    return `<div class="skill ${s.status === "needs_review" ? "review" : ""} ${v === "reject" ? "rejected" : ""}" data-id="${s.id}" tabindex="0">
+      <div><span class="name">${esc(s.label)}</span></div>
+      <div class="acts"><button data-v="accept" aria-label="Accept ${esc(s.label)}">${v === "accept" ? "✓ kept" : "Keep"}</button><button data-v="reject" aria-label="Reject ${esc(s.label)}">${v === "reject" ? "✗ removed" : "Remove"}</button></div>
+      <div class="meta"><span class="pill ${s.importance === "required" ? "req" : "pref"}">${s.importance === "required" ? "required" : "nice to have"}</span>${s.status === "needs_review" ? '<span class="pill rev">please check</span>' : ""}
+        confidence ${s.confidence.toFixed(2)} · ${ev.kind === "semantic" ? "described" : "named"}: “${esc(ev.quote.slice(0, 70))}${ev.quote.length > 70 ? "…" : ""}”${g}</div>
+    </div>`;
+  }).join("") || `<p class="note">No skills found.</p>`;
+
+  let extra = "";
+  if (goldIds) {
+    const missed = [...goldIds.keys()].filter((id) => !out.skills.some((s) => s.id === id && s.status === "suggested"));
+    if (missed.length) extra += `<h3 style="margin-top:16px">Gold skills not suggested</h3><ul class="list">${missed.map((id) => `<li>${esc(pipe.taxonomy.byId[id].label)}</li>`).join("")}</ul>`;
+  }
+  if (out.uncovered_requirements.length) extra += `<h3 style="margin-top:16px">Not linked to any skill</h3><ul class="list">${out.uncovered_requirements.map((u) => `<li>${esc(u.text)}</li>`).join("")}</ul>`;
+  if (out.language_flags.length) extra += `<h3 style="margin-top:16px">Coded wording</h3><ul class="list">${out.language_flags.map((f) => `<li><b>${f.category}</b>: “${esc(f.quote)}”. ${esc(f.suggestion)}</li>`).join("")}</ul>`;
+  $("extra").innerHTML = extra;
+  $("feedback").textContent = Object.entries(verdicts).map(([id, v]) => JSON.stringify({ request_id: "(from the profile response)", skill_id: id, verdict: v })).join("\n") || "(no verdicts yet)";
+}
+
+$("skills").addEventListener("click", (e) => {
+  const card = e.target.closest(".skill");
+  if (!card) return;
+  const v = e.target.closest("button")?.dataset.v;
+  if (v) verdicts[card.dataset.id] = verdicts[card.dataset.id] === v ? undefined : v;
+  else active = active === card.dataset.id ? null : card.dataset.id;
+  for (const k of Object.keys(verdicts)) if (!verdicts[k]) delete verdicts[k];
+  render($("text").value, last);
+});
+
+// ------------------------------------------------------------ tour
+const signature = (o) => JSON.stringify(o.skills.map((s) => [s.id, s.status, s.importance, s.confidence]));
+const steps = [
+  { t: "A fictional job ad for a maintenance technician. The production pipeline runs right here, in your browser.", go: () => { setMode("D"); load("maintenance-technician"); } },
+  { t: "Green: a taxonomy alias was named. Blue: a sentence was read as describing a skill. “You find the cause of faults in wiring, motors and control cabinets” became Electrical troubleshooting, without the words ever appearing.", go: () => { active = "electrical-troubleshooting"; render($("text").value, last); } },
+  { t: "What is missing matters as much: “Our plants run on SAP” (company talk), “No prior experience with welding is required” (negated) and “Training in lean manufacturing” (the offer) are all left out.", go: () => { active = null; render($("text").value, last); } },
+  { t: "Fairness check: we add “He will report to the plant manager.” and “Join our young and dynamic team.” to the ad.", go: () => {
+      const before = signature(last);
+      $("text").value = $("text").value.replace("Your role\n", "Your role\nHe will report to the plant manager.\nJoin our young and dynamic team.\n");
+      run();
+      steps[4].t = signature(last) === before
+        ? "Same skills, same statuses, same confidence to three decimals: the profile did not move. Both phrases are flagged in purple with a neutral alternative. In the first eval run this was true for only 60% of such variants."
+        : "The profile changed. That would fail the release gate.";
+    } },
+  { t: "", go: () => {} },
+  { t: "Now the day-one spike (configuration A): skill labels anywhere in the text. It misses most skills, and look at what it does suggest: Welding, from “No prior experience with welding is required”, and Lean manufacturing, from the offer.", go: () => { load("maintenance-technician"); setMode("A"); } },
+  { t: "The same pipeline on a Dutch ad. One taxonomy, aliases in both languages.", go: () => { setMode("D"); load("onderhoudstechnicus"); } },
+  { t: "That is the product. The case page shows how each design step was measured, and the repository has the evals, ADRs and the evidence ledger.", go: () => {}, last: true },
+];
+let step = 0;
+function showStep() {
+  const s = steps[step];
+  s.go();
+  $("tour").hidden = false;
+  $("tour").innerHTML = `<small>Tour ${step + 1} / ${steps.length}</small><p>${s.t || steps[step].t}</p>
+    <div class="row">${s.last ? `<button class="primary" id="tEnd">Back to the case</button>` : `<button class="primary" id="tNext">Next</button>`}<button id="tClose">Close</button></div>`;
+  $("tClose").onclick = () => { $("tour").hidden = true; };
+  if (s.last) $("tEnd").onclick = () => { location.href = "../#evals"; };
+  else $("tNext").onclick = () => { step++; showStep(); };
+}
+load(samples[0].id);
+if (new URLSearchParams(location.search).has("tour")) showStep();
+</script>
+</body>
+</html>

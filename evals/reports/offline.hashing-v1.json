@@ -1,12 +1,12 @@
 {
  "embedder": "hashing-v1",
- "model_version": "scorer-86e2552a",
+ "model_version": "scorer-dcf5b308",
  "taxonomy_version": "2026.10",
  "test_descriptions": 100,
  "gold_skills": 849,
  "thresholds": {
   "accept_at": 0.425,
-  "review_at": 0.05,
+  "review_at": 0.344,
   "config_C_similarity": 0.14
  },
  "configs": {
@@ -248,13 +248,13 @@
    "importance_accuracy": 0.9691,
    "evidence_accuracy": 1.0,
    "review": {
-    "items": 210,
-    "per_description": 2.1,
-    "precision_in_band": 0.0571,
-    "recall_with_review": 0.967
+    "items": 30,
+    "per_description": 0.3,
+    "precision_in_band": 0.1667,
+    "recall_with_review": 0.9588
    },
-   "missed_but_flagged_uncovered": 0.5,
-   "missed": 28,
+   "missed_but_flagged_uncovered": 0.4571,
+   "missed": 35,
    "language_f1_gap": 0.0199,
    "match_ndcg_at_5": 0.9938
   }

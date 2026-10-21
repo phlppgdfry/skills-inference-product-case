@@ -188,7 +188,8 @@ class Pipeline:
         skills.sort(key=lambda s: (s["status"] != "suggested", s["importance"] != "required", -s["confidence"], s["id"]))
         covered = {e["sentence"] for s in skills for e in s["evidence"]}
         uncovered = [{"start": s.start, "end": s.end, "text": s.text} for s in a.sentences
-                     if not s.heading and s.section in ("req", "resp") and s.index not in covered and not s.requirement_negated]
+                     if not s.heading and s.section in ("req", "resp") and s.index not in covered
+                     and not s.requirement_negated and s.index not in a.excluded]
         return {
             "skills": skills,
             "uncovered_requirements": uncovered,

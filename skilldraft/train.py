@@ -47,6 +47,6 @@ def train(pipeline, l2: float = L2) -> LogisticModel:
     w, b = train_logistic(X, y, l2=l2)
     model = LogisticModel(w, b, embedder=pipeline.embedder.name, l2=l2,
                           trained_on="train split: " + hashlib.sha256(json.dumps(train_jds, sort_keys=True).encode()).hexdigest()[:12])
-    Xd, yd, pos_d = examples(pipeline, dev_jds)
-    model.accept_at, model.review_at = pick_thresholds([model.predict(x) for x in Xd], yd, pos_d)
+    Xd, yd, _ = examples(pipeline, dev_jds)
+    model.accept_at, model.review_at = pick_thresholds([model.predict(x) for x in Xd], yd)
     return model

@@ -34,6 +34,7 @@ from skilldraft.embed import HashingEmbedder  # noqa: E402
 from skilldraft.llm import PROMPT_PATH, PROMPT_VERSION  # noqa: E402
 from skilldraft.pipeline import Pipeline  # noqa: E402
 from skilldraft.taxonomy import Taxonomy  # noqa: E402
+from skilldraft.text import detect_language  # noqa: E402
 from skilldraft.train import load_jds, model_path, train  # noqa: E402
 
 MARKER = re.compile(r"<!--n:([\w.\-]+)-->(.*?)<!--/n-->", re.S)
@@ -107,8 +108,10 @@ def site_data(r: dict, sw: dict, hf: dict | None) -> dict[str, str]:
     pipe = default_pipeline()
     model = pipe.model.to_json() | {"min_similarity": HashingEmbedder.min_similarity}
     jds = {j["id"]: j for j in load_jds()}
-    samples = [{"id": i, "title": jds[i]["title"], "lang": jds[i]["lang"], "text": jds[i]["text"],
-                "gold": [{"id": g["id"], "importance": g["importance"]} for g in jds[i]["gold"]["skills"]]} for i in SAMPLES]
+    samples = [{"id": f.stem, "title": f.read_text(encoding="utf-8").split("\n", 1)[0], "lang": detect_language(f.read_text(encoding="utf-8")),
+                "text": f.read_text(encoding="utf-8").strip(), "gold": None} for f in sorted((ROOT / "data" / "samples").glob("*.txt"))]
+    samples += [{"id": i, "title": jds[i]["title"], "lang": jds[i]["lang"], "text": jds[i]["text"],
+                 "gold": [{"id": g["id"], "importance": g["importance"]} for g in jds[i]["gold"]["skills"]]} for i in SAMPLES]
     parity = []
     for j in load_jds("test"):
         out = pipe.infer(j["text"])
