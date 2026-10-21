@@ -1,0 +1,60 @@
+{"id": "EMP-001", "home_family": "software", "skills": ["agile", "automated-testing", "aws", "dashboarding", "java", "javascript", "nlp", "rest-api-design", "sql"]}
+{"id": "EMP-002", "home_family": "data", "skills": ["dashboarding", "data-analysis", "data-pipelines", "dutch", "nlp", "python", "stakeholder-management", "statistics"]}
+{"id": "EMP-003", "home_family": "maintenance", "skills": ["cnc-machining", "english", "forklift", "french", "quality-control", "root-cause-analysis", "technical-drawings"]}
+{"id": "EMP-004", "home_family": "production", "skills": ["dutch", "food-safety", "quality-control", "shift-leadership", "workplace-safety"]}
+{"id": "EMP-005", "home_family": "logistics", "skills": ["customs", "german", "procurement", "sap-logistics", "supply-chain-planning", "wms", "workplace-safety"]}
+{"id": "EMP-006", "home_family": "sales", "skills": ["b2b-sales", "customer-service", "dutch", "german", "negotiation"]}
+{"id": "EMP-007", "home_family": "hr", "skills": ["budgeting", "controlling", "french", "labour-law", "onboarding", "payroll", "performance-management", "recruitment"]}
+{"id": "EMP-008", "home_family": "finance", "skills": ["accounts-payable", "budgeting", "controlling", "dutch", "financial-reporting", "ifrs", "performance-management", "project-management"]}
+{"id": "EMP-009", "home_family": "software", "skills": ["agile", "aws", "ci-cd", "dashboarding", "java", "javascript", "kubernetes", "machine-learning", "python", "rest-api-design"]}
+{"id": "EMP-010", "home_family": "data", "skills": ["dashboarding", "data-analysis", "data-pipelines", "english", "machine-learning", "nlp", "stakeholder-management", "statistics"]}
+{"id": "EMP-011", "home_family": "maintenance", "skills": ["cnc-machining", "english", "french", "hydraulics-pneumatics", "plc-programming", "preventive-maintenance", "root-cause-analysis", "technical-drawings", "welding"]}
+{"id": "EMP-012", "home_family": "production", "skills": ["communication", "dutch", "lean-manufacturing", "quality-control", "technical-drawings", "workplace-safety"]}
+{"id": "EMP-013", "home_family": "logistics", "skills": ["customs", "english", "inventory-management", "procurement", "route-planning", "sap-logistics", "supply-chain-planning"]}
+{"id": "EMP-014", "home_family": "sales", "skills": ["crm", "french", "negotiation", "presentation-skills", "wms"]}
+{"id": "EMP-015", "home_family": "hr", "skills": ["coaching", "dutch", "french", "hris", "ifrs", "labour-law", "onboarding", "payroll", "performance-management", "recruitment"]}
+{"id": "EMP-016", "home_family": "finance", "skills": ["accounts-payable", "budgeting", "excel", "financial-modelling", "financial-reporting", "ifrs", "project-management"]}
+{"id": "EMP-017", "home_family": "software", "skills": ["docker", "english", "git", "java", "javascript", "kubernetes", "nlp", "python", "sql"]}
+{"id": "EMP-018", "home_family": "data", "skills": ["aws", "data-analysis", "data-pipelines", "deep-learning", "machine-learning", "rest-api-design", "stakeholder-management", "statistics"]}
+{"id": "EMP-019", "home_family": "maintenance", "skills": ["dutch", "electrical-troubleshooting", "hydraulics-pneumatics", "preventive-maintenance", "quality-control"]}
+{"id": "EMP-020", "home_family": "production", "skills": ["communication", "forklift", "inventory-management", "iso-9001", "production-planning", "workplace-safety"]}
+{"id": "EMP-021", "home_family": "logistics", "skills": ["german", "inventory-management", "procurement", "wms"]}
+{"id": "EMP-022", "home_family": "sales", "skills": ["account-management", "b2b-sales", "customs", "german", "market-analysis", "sap-logistics"]}
+{"id": "EMP-023", "home_family": "hr", "skills": ["coaching", "communication", "hris", "labour-law", "onboarding", "payroll", "recruitment"]}
+{"id": "EMP-024", "home_family": "finance", "skills": ["accounts-payable", "controlling", "dutch", "financial-modelling", "financial-reporting", "ifrs"]}
+{"id": "EMP-025", "home_family": "software", "skills": ["automated-testing", "aws", "dashboarding", "deep-learning", "english", "git", "java", "javascript", "kubernetes", "python"]}
+{"id": "EMP-026", "home_family": "data", "skills": ["dashboarding", "data-analysis", "english", "java", "machine-learning", "stakeholder-management"]}
+{"id": "EMP-027", "home_family": "maintenance", "skills": ["english", "hydraulics-pneumatics", "plc-programming", "preventive-maintenance", "production-planning", "quality-control", "root-cause-analysis"]}
+{"id": "EMP-028", "home_family": "production", "skills": ["communication", "electrical-troubleshooting", "food-safety", "forklift", "iso-9001", "lean-manufacturing", "production-planning", "quality-control", "shift-leadership"]}
+{"id": "EMP-029", "home_family": "logistics", "skills": ["customs", "english", "german", "inventory-management", "lean-manufacturing", "procurement", "sap-logistics", "supply-chain-planning", "wms"]}
+{"id": "EMP-030", "home_family": "sales", "skills": ["b2b-sales", "crm", "french", "german", "market-analysis", "negotiation"]}
+{"id": "EMP-031", "home_family": "hr", "skills": ["coaching", "onboarding", "performance-management", "recruitment", "stakeholder-management"]}
+{"id": "EMP-032", "home_family": "finance", "skills": ["accounts-payable", "budgeting", "controlling", "excel", "financial-modelling", "financial-reporting", "ifrs", "project-management"]}
+{"id": "EMP-033", "home_family": "software", "skills": ["dashboarding", "dutch", "english", "git", "javascript", "python", "rest-api-design"]}
+{"id": "EMP-034", "home_family": "data", "skills": ["dashboarding", "data-analysis", "data-pipelines", "deep-learning", "english", "java", "javascript", "machine-learning"]}
+{"id": "EMP-035", "home_family": "maintenance", "skills": ["english", "hydraulics-pneumatics", "lean-manufacturing", "plc-programming", "preventive-maintenance", "production-planning", "technical-drawings"]}
+{"id": "EMP-036", "home_family": "production", "skills": ["french", "iso-9001", "production-planning", "workplace-safety"]}
+{"id": "EMP-037", "home_family": "logistics", "skills": ["customs", "french", "inventory-management", "procurement", "route-planning", "sap-logistics", "supply-chain-planning", "wms"]}
+{"id": "EMP-038", "home_family": "sales", "skills": ["account-management", "communication", "crm", "customer-service", "english", "market-analysis", "presentation-skills", "route-planning"]}
+{"id": "EMP-039", "home_family": "hr", "skills": ["budgeting", "dutch", "hris", "ifrs", "labour-law", "performance-management"]}
+{"id": "EMP-040", "home_family": "finance", "skills": ["accounts-payable", "dutch", "english", "excel", "ifrs", "labour-law", "performance-management"]}
+{"id": "EMP-041", "home_family": "software", "skills": ["agile", "ci-cd", "data-pipelines", "docker", "dutch", "javascript"]}
+{"id": "EMP-042", "home_family": "data", "skills": ["dashboarding", "data-analysis", "data-modelling", "dutch", "machine-learning", "statistics"]}
+{"id": "EMP-043", "home_family": "maintenance", "skills": ["cnc-machining", "electrical-troubleshooting", "forklift", "french", "hydraulics-pneumatics", "plc-programming", "quality-control", "root-cause-analysis", "technical-drawings"]}
+{"id": "EMP-044", "home_family": "production", "skills": ["communication", "dutch", "food-safety", "iso-9001", "quality-control", "shift-leadership"]}
+{"id": "EMP-045", "home_family": "logistics", "skills": ["customs", "french", "german", "inventory-management", "lean-manufacturing", "route-planning", "shift-leadership", "wms"]}
+{"id": "EMP-046", "home_family": "sales", "skills": ["account-management", "customer-service", "german", "inventory-management", "market-analysis", "presentation-skills", "route-planning"]}
+{"id": "EMP-047", "home_family": "hr", "skills": ["budgeting", "coaching", "communication", "labour-law", "onboarding", "payroll", "performance-management", "recruitment"]}
+{"id": "EMP-048", "home_family": "finance", "skills": ["accounts-payable", "budgeting", "controlling", "english", "excel", "financial-modelling", "financial-reporting", "hris", "ifrs", "project-management"]}
+{"id": "EMP-049", "home_family": "software", "skills": ["automated-testing", "ci-cd", "dutch", "english", "javascript", "kubernetes", "python"]}
+{"id": "EMP-050", "home_family": "data", "skills": ["data-analysis", "data-modelling", "data-pipelines", "deep-learning", "dutch", "english", "machine-learning", "nlp", "statistics"]}
+{"id": "EMP-051", "home_family": "maintenance", "skills": ["cnc-machining", "dutch", "electrical-troubleshooting", "english", "hydraulics-pneumatics", "plc-programming", "preventive-maintenance", "root-cause-analysis", "technical-drawings"]}
+{"id": "EMP-052", "home_family": "production", "skills": ["food-safety", "french", "lean-manufacturing", "quality-control", "shift-leadership", "wms"]}
+{"id": "EMP-053", "home_family": "logistics", "skills": ["customs", "german", "inventory-management", "iso-9001", "procurement", "route-planning", "sap-logistics", "supply-chain-planning"]}
+{"id": "EMP-054", "home_family": "sales", "skills": ["account-management", "b2b-sales", "dutch", "german", "negotiation"]}
+{"id": "EMP-055", "home_family": "hr", "skills": ["coaching", "communication", "hris", "labour-law", "onboarding", "payroll", "performance-management", "recruitment"]}
+{"id": "EMP-056", "home_family": "finance", "skills": ["accounts-payable", "budgeting", "english", "financial-modelling", "hris", "ifrs", "onboarding", "project-management"]}
+{"id": "EMP-057", "home_family": "software", "skills": ["aws", "dutch", "english", "javascript", "nlp", "rest-api-design"]}
+{"id": "EMP-058", "home_family": "data", "skills": ["data-analysis", "data-pipelines", "dutch", "english", "machine-learning", "nlp", "rest-api-design", "statistics"]}
+{"id": "EMP-059", "home_family": "maintenance", "skills": ["electrical-troubleshooting", "english", "forklift", "french", "hydraulics-pneumatics", "iso-9001", "plc-programming", "preventive-maintenance", "root-cause-analysis", "welding"]}
+{"id": "EMP-060", "home_family": "production", "skills": ["communication", "forklift", "french", "iso-9001", "lean-manufacturing", "welding"]}

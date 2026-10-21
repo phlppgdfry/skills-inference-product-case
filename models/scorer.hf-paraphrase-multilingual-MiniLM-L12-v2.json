@@ -1,0 +1,35 @@
+{
+ "version": "scorer-5be88cac",
+ "embedder": "hf-paraphrase-multilingual-MiniLM-L12-v2",
+ "features": [
+  "exact_good",
+  "exact_bad",
+  "negated",
+  "sem_good",
+  "sem_margin",
+  "ambiguous_only",
+  "mentions",
+  "in_pref",
+  "in_title",
+  "company_voice",
+  "no_headings"
+ ],
+ "weights": [
+  4.387177,
+  -2.110565,
+  -1.224193,
+  2.013879,
+  6.570188,
+  -1.475807,
+  1.494052,
+  0.042608,
+  0.138559,
+  -0.637897,
+  -0.448674
+ ],
+ "bias": -2.14885,
+ "accept_at": 0.431,
+ "review_at": 0.05,
+ "l2": 0.001,
+ "trained_on": "train split: dcf0085b5abc"
+}

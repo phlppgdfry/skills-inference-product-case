@@ -1,0 +1,2762 @@
+{
+ "version": "2026.10",
+ "skills": [
+  {
+   "id": "python",
+   "label": "Python",
+   "family": "software",
+   "aliases": [
+    {
+     "text": "Python",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Python 3",
+     "lang": "en",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "General-purpose programming language used for scripting, back-end services, automation and data work.",
+    "nl": "Programmeertaal voor scripts, back-end diensten, automatisering en datawerk."
+   },
+   "related": [
+    "java"
+   ]
+  },
+  {
+   "id": "java",
+   "label": "Java",
+   "family": "software",
+   "aliases": [
+    {
+     "text": "Java",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Java EE",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Spring Boot",
+     "lang": "en",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Object-oriented programming language for enterprise back-end applications on the JVM.",
+    "nl": "Objectgeoriënteerde programmeertaal voor zakelijke back-end toepassingen op de JVM."
+   },
+   "related": [
+    "python",
+    "javascript"
+   ]
+  },
+  {
+   "id": "javascript",
+   "label": "JavaScript / TypeScript",
+   "family": "software",
+   "aliases": [
+    {
+     "text": "JavaScript / TypeScript",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "JavaScript",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "TypeScript",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Node.js",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "React",
+     "lang": "en",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Languages and frameworks for interactive web front-ends and Node.js services.",
+    "nl": "Talen en frameworks voor interactieve webinterfaces en Node.js-diensten."
+   },
+   "related": [
+    "java",
+    "sql"
+   ]
+  },
+  {
+   "id": "sql",
+   "label": "SQL",
+   "family": "software",
+   "aliases": [
+    {
+     "text": "SQL",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "PostgreSQL",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "MySQL",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "SQL Server",
+     "lang": "en",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Querying, joining and managing data in relational databases.",
+    "nl": "Data opvragen, koppelen en beheren in relationele databanken."
+   },
+   "related": [
+    "javascript",
+    "rest-api-design"
+   ]
+  },
+  {
+   "id": "rest-api-design",
+   "label": "REST API design",
+   "family": "software",
+   "aliases": [
+    {
+     "text": "REST API design",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "REST API",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "REST APIs",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "RESTful",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "API design",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "OpenAPI",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "API-ontwerp",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Designing HTTP interfaces between systems: resources, versioning, error handling and contracts.",
+    "nl": "HTTP-interfaces tussen systemen ontwerpen: resources, versies, foutafhandeling en contracten."
+   },
+   "related": [
+    "sql",
+    "docker"
+   ]
+  },
+  {
+   "id": "docker",
+   "label": "Containerisation (Docker)",
+   "family": "software",
+   "aliases": [
+    {
+     "text": "Containerisation (Docker)",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Docker",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "containerisation",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "containerization",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "containers",
+     "lang": "en",
+     "ambiguous": true
+    },
+    {
+     "text": "containerisatie",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Packaging applications and their dependencies into portable container images.",
+    "nl": "Toepassingen en hun afhankelijkheden verpakken in draagbare container-images."
+   },
+   "related": [
+    "rest-api-design",
+    "kubernetes"
+   ]
+  },
+  {
+   "id": "kubernetes",
+   "label": "Kubernetes",
+   "family": "software",
+   "aliases": [
+    {
+     "text": "Kubernetes",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "K8s",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "OpenShift",
+     "lang": "en",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Orchestrating containerised workloads across clusters: deployment, scaling and self-healing.",
+    "nl": "Workloads in containers orkestreren over clusters: uitrollen, schalen en zelfherstel."
+   },
+   "related": [
+    "docker",
+    "ci-cd"
+   ]
+  },
+  {
+   "id": "ci-cd",
+   "label": "CI/CD pipelines",
+   "family": "software",
+   "aliases": [
+    {
+     "text": "CI/CD pipelines",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "CI/CD",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "continuous integration",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "continuous delivery",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "GitHub Actions",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "GitLab CI",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Jenkins",
+     "lang": "en",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Automating the build, test and release of software through pipelines.",
+    "nl": "Het bouwen, testen en uitrollen van software automatiseren met pipelines."
+   },
+   "related": [
+    "kubernetes",
+    "aws"
+   ]
+  },
+  {
+   "id": "aws",
+   "label": "Amazon Web Services (AWS)",
+   "family": "software",
+   "aliases": [
+    {
+     "text": "Amazon Web Services (AWS)",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "AWS",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Amazon Web Services",
+     "lang": "en",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Building and running workloads on Amazon's public cloud.",
+    "nl": "Workloads bouwen en draaien in de publieke cloud van Amazon."
+   },
+   "related": [
+    "ci-cd",
+    "automated-testing"
+   ]
+  },
+  {
+   "id": "automated-testing",
+   "label": "Automated testing",
+   "family": "software",
+   "aliases": [
+    {
+     "text": "automated testing",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "unit testing",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "unit tests",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "test automation",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "pytest",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "integration tests",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "testautomatisering",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "geautomatiseerd testen",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Writing automated unit, integration and end-to-end tests that guard software quality.",
+    "nl": "Geautomatiseerde unit-, integratie- en end-to-end tests schrijven die de softwarekwaliteit bewaken."
+   },
+   "related": [
+    "aws",
+    "git"
+   ]
+  },
+  {
+   "id": "git",
+   "label": "Git",
+   "family": "software",
+   "aliases": [
+    {
+     "text": "Git",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "version control",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "versiebeheer",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Tracking changes to code with branches, commits and merges.",
+    "nl": "Wijzigingen aan code bijhouden met branches, commits en merges."
+   },
+   "related": [
+    "automated-testing"
+   ]
+  },
+  {
+   "id": "data-analysis",
+   "label": "Data analysis",
+   "family": "data",
+   "aliases": [
+    {
+     "text": "data analysis",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "data analytics",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "data-analyse",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "analyse van data",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Exploring and interpreting data to answer business questions.",
+    "nl": "Data verkennen en interpreteren om zakelijke vragen te beantwoorden."
+   },
+   "related": [
+    "dashboarding"
+   ]
+  },
+  {
+   "id": "dashboarding",
+   "label": "Dashboarding (Power BI)",
+   "family": "data",
+   "aliases": [
+    {
+     "text": "Dashboarding (Power BI)",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Power BI",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "PowerBI",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Tableau",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "DAX",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "dashboards",
+     "lang": "en",
+     "ambiguous": true
+    }
+   ],
+   "definition": {
+    "en": "Building interactive reports and dashboards that track KPIs.",
+    "nl": "Interactieve rapporten en dashboards bouwen die KPI's opvolgen."
+   },
+   "related": [
+    "data-analysis",
+    "statistics"
+   ]
+  },
+  {
+   "id": "statistics",
+   "label": "Statistics",
+   "family": "data",
+   "aliases": [
+    {
+     "text": "statistics",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "statistical analysis",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "regression analysis",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "hypothesis testing",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "statistiek",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "statistische analyse",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Applying statistical methods such as significance tests and regression to data.",
+    "nl": "Statistische methoden zoals significantietests en regressie toepassen op data."
+   },
+   "related": [
+    "dashboarding",
+    "machine-learning"
+   ]
+  },
+  {
+   "id": "machine-learning",
+   "label": "Machine learning",
+   "family": "data",
+   "aliases": [
+    {
+     "text": "machine learning",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "predictive modelling",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "predictive modeling",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "scikit-learn",
+     "lang": "en",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Training and evaluating models that learn patterns from data to make predictions.",
+    "nl": "Modellen trainen en evalueren die patronen uit data leren om voorspellingen te doen."
+   },
+   "related": [
+    "statistics",
+    "data-modelling"
+   ]
+  },
+  {
+   "id": "data-modelling",
+   "label": "Data modelling",
+   "family": "data",
+   "aliases": [
+    {
+     "text": "data modelling",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "data modeling",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "dimensional modelling",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "star schema",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "datamodellering",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Designing tables, keys and relationships for analytical and operational data.",
+    "nl": "Tabellen, sleutels en relaties ontwerpen voor analytische en operationele data."
+   },
+   "related": [
+    "machine-learning",
+    "data-pipelines"
+   ]
+  },
+  {
+   "id": "data-pipelines",
+   "label": "Data pipelines (ETL)",
+   "family": "data",
+   "aliases": [
+    {
+     "text": "Data pipelines (ETL)",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "ETL",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "ELT",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "data pipelines",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Airflow",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "dbt",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "datapijplijnen",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Moving and transforming data from source systems into a warehouse on a schedule.",
+    "nl": "Data volgens planning van bronsystemen naar een datawarehouse brengen en transformeren."
+   },
+   "related": [
+    "data-modelling",
+    "deep-learning"
+   ]
+  },
+  {
+   "id": "deep-learning",
+   "label": "Deep learning (PyTorch)",
+   "family": "data",
+   "aliases": [
+    {
+     "text": "Deep learning (PyTorch)",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "PyTorch",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "deep learning",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "TensorFlow",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "neural networks",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "neurale netwerken",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Building and training neural networks with frameworks such as PyTorch.",
+    "nl": "Neurale netwerken bouwen en trainen met frameworks zoals PyTorch."
+   },
+   "related": [
+    "data-pipelines",
+    "nlp"
+   ]
+  },
+  {
+   "id": "nlp",
+   "label": "Natural language processing",
+   "family": "data",
+   "aliases": [
+    {
+     "text": "NLP",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "natural language processing",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "text mining",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "large language models",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "LLMs",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "transformers",
+     "lang": "en",
+     "ambiguous": true
+    }
+   ],
+   "definition": {
+    "en": "Building systems that understand, classify or generate human language.",
+    "nl": "Systemen bouwen die menselijke taal begrijpen, classificeren of genereren."
+   },
+   "related": [
+    "deep-learning"
+   ]
+  },
+  {
+   "id": "plc-programming",
+   "label": "PLC programming",
+   "family": "maintenance",
+   "aliases": [
+    {
+     "text": "PLC",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "PLC programming",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Siemens S7",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "TIA Portal",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "PLC-programmatie",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Programming and modifying programmable logic controllers that drive machines.",
+    "nl": "Programmeerbare sturingen (PLC's) programmeren en aanpassen die machines aansturen."
+   },
+   "related": [
+    "preventive-maintenance"
+   ]
+  },
+  {
+   "id": "preventive-maintenance",
+   "label": "Preventive maintenance",
+   "family": "maintenance",
+   "aliases": [
+    {
+     "text": "preventive maintenance",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "planned maintenance",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "TPM",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "preventief onderhoud",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Planning inspections and part replacements so equipment does not fail.",
+    "nl": "Inspecties en vervangingen plannen zodat installaties niet uitvallen."
+   },
+   "related": [
+    "plc-programming",
+    "electrical-troubleshooting"
+   ]
+  },
+  {
+   "id": "electrical-troubleshooting",
+   "label": "Electrical troubleshooting",
+   "family": "maintenance",
+   "aliases": [
+    {
+     "text": "electrical troubleshooting",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "electrical diagnostics",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "BA4",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "BA5",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "elektrische storingen",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "elektrische diagnose",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Diagnosing faults in wiring, motors, drives and control cabinets.",
+    "nl": "Fouten opsporen in bekabeling, motoren, aandrijvingen en schakelkasten."
+   },
+   "related": [
+    "preventive-maintenance",
+    "hydraulics-pneumatics"
+   ]
+  },
+  {
+   "id": "hydraulics-pneumatics",
+   "label": "Hydraulics and pneumatics",
+   "family": "maintenance",
+   "aliases": [
+    {
+     "text": "Hydraulics and pneumatics",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "hydraulics",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "pneumatics",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "hydraulic systems",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "hydrauliek",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "pneumatiek",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Maintaining hydraulic and compressed-air systems: cylinders, valves and pumps.",
+    "nl": "Hydraulische en persluchtsystemen onderhouden: cilinders, ventielen en pompen."
+   },
+   "related": [
+    "electrical-troubleshooting",
+    "welding"
+   ]
+  },
+  {
+   "id": "welding",
+   "label": "Welding",
+   "family": "maintenance",
+   "aliases": [
+    {
+     "text": "welding",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "TIG welding",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "MIG welding",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "MIG/MAG",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "lassen",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Joining metal parts with arc welding processes such as TIG and MIG/MAG.",
+    "nl": "Metalen onderdelen verbinden met booglasprocessen zoals TIG en MIG/MAG."
+   },
+   "related": [
+    "hydraulics-pneumatics",
+    "cnc-machining"
+   ]
+  },
+  {
+   "id": "cnc-machining",
+   "label": "CNC machining",
+   "family": "maintenance",
+   "aliases": [
+    {
+     "text": "CNC",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "CNC machining",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "CNC-bewerking",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Setting up and operating computer-controlled milling and turning machines.",
+    "nl": "Computergestuurde frees- en draaimachines instellen en bedienen."
+   },
+   "related": [
+    "welding",
+    "technical-drawings"
+   ]
+  },
+  {
+   "id": "technical-drawings",
+   "label": "Reading technical drawings",
+   "family": "maintenance",
+   "aliases": [
+    {
+     "text": "Reading technical drawings",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "technical drawings",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "blueprints",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "electrical schematics",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "technische tekeningen",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "elektrische schema's",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Reading plans, schematics and drawings to understand how equipment is built.",
+    "nl": "Plannen, schema's en tekeningen lezen om te begrijpen hoe installaties opgebouwd zijn."
+   },
+   "related": [
+    "cnc-machining",
+    "root-cause-analysis"
+   ]
+  },
+  {
+   "id": "root-cause-analysis",
+   "label": "Root-cause analysis",
+   "family": "maintenance",
+   "aliases": [
+    {
+     "text": "root cause analysis",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "root-cause analysis",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "5 why",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Ishikawa",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "8D",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "oorzaakanalyse",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Finding the underlying cause of recurring problems with structured methods.",
+    "nl": "De onderliggende oorzaak van terugkerende problemen vinden met gestructureerde methoden."
+   },
+   "related": [
+    "technical-drawings"
+   ]
+  },
+  {
+   "id": "lean-manufacturing",
+   "label": "Lean manufacturing",
+   "family": "production",
+   "aliases": [
+    {
+     "text": "lean",
+     "lang": "en",
+     "ambiguous": true
+    },
+    {
+     "text": "lean manufacturing",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "kaizen",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "5S",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "continuous improvement",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Six Sigma",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "continu verbeteren",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Removing waste from production processes with methods such as kaizen and 5S.",
+    "nl": "Verspilling uit productieprocessen halen met methoden zoals kaizen en 5S."
+   },
+   "related": [
+    "quality-control"
+   ]
+  },
+  {
+   "id": "quality-control",
+   "label": "Quality control",
+   "family": "production",
+   "aliases": [
+    {
+     "text": "quality control",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "quality inspection",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "SPC",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "kwaliteitscontrole",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Inspecting products against specifications and blocking what does not conform.",
+    "nl": "Producten tegen specificaties controleren en blokkeren wat niet conform is."
+   },
+   "related": [
+    "lean-manufacturing",
+    "iso-9001"
+   ]
+  },
+  {
+   "id": "iso-9001",
+   "label": "ISO 9001",
+   "family": "production",
+   "aliases": [
+    {
+     "text": "ISO 9001",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "ISO9001",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "quality management system",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "kwaliteitsmanagementsysteem",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Running a certified quality management system and preparing for audits.",
+    "nl": "Een gecertificeerd kwaliteitsmanagementsysteem beheren en audits voorbereiden."
+   },
+   "related": [
+    "quality-control",
+    "food-safety"
+   ]
+  },
+  {
+   "id": "food-safety",
+   "label": "Food safety (HACCP)",
+   "family": "production",
+   "aliases": [
+    {
+     "text": "Food safety (HACCP)",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "HACCP",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "food safety",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "BRCGS",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "voedselveiligheid",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Controlling hygiene and critical control points in food production.",
+    "nl": "Hygiëne en kritische controlepunten in de voedingsproductie bewaken."
+   },
+   "related": [
+    "iso-9001",
+    "production-planning"
+   ]
+  },
+  {
+   "id": "production-planning",
+   "label": "Production planning",
+   "family": "production",
+   "aliases": [
+    {
+     "text": "production planning",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "capacity planning",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "MRP",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "productieplanning",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "capaciteitsplanning",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Scheduling orders on lines and machines so that capacity and deadlines match.",
+    "nl": "Orders op lijnen en machines inplannen zodat capaciteit en deadlines kloppen."
+   },
+   "related": [
+    "food-safety",
+    "shift-leadership"
+   ]
+  },
+  {
+   "id": "shift-leadership",
+   "label": "Shift leadership",
+   "family": "production",
+   "aliases": [
+    {
+     "text": "shift leadership",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "shift leader",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "team leader",
+     "lang": "en",
+     "ambiguous": true
+    },
+    {
+     "text": "ploegleider",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "ploegleiding",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Leading a team of operators during a shift and handing over to the next one.",
+    "nl": "Een ploeg operatoren aansturen tijdens een shift en overdragen aan de volgende."
+   },
+   "related": [
+    "production-planning",
+    "workplace-safety"
+   ]
+  },
+  {
+   "id": "workplace-safety",
+   "label": "Workplace safety",
+   "family": "production",
+   "aliases": [
+    {
+     "text": "workplace safety",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "health and safety",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "VCA",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "safety",
+     "lang": "en",
+     "ambiguous": true
+    },
+    {
+     "text": "veiligheid op het werk",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "veiligheid",
+     "lang": "nl",
+     "ambiguous": true
+    }
+   ],
+   "definition": {
+    "en": "Preventing accidents: risk analysis, safe work instructions and incident follow-up.",
+    "nl": "Ongevallen voorkomen: risicoanalyse, veilige werkinstructies en opvolging van incidenten."
+   },
+   "related": [
+    "shift-leadership",
+    "forklift"
+   ]
+  },
+  {
+   "id": "forklift",
+   "label": "Forklift operation",
+   "family": "production",
+   "aliases": [
+    {
+     "text": "Forklift operation",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "forklift",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "reach truck",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "forklift licence",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "heftruck",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "reachtruck",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "heftruckattest",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Operating forklifts and reach trucks to move goods in a warehouse or plant.",
+    "nl": "Heftrucks en reachtrucks besturen om goederen te verplaatsen in een magazijn of fabriek."
+   },
+   "related": [
+    "workplace-safety"
+   ]
+  },
+  {
+   "id": "wms",
+   "label": "Warehouse management systems",
+   "family": "logistics",
+   "aliases": [
+    {
+     "text": "WMS",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "warehouse management system",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "warehouse management systems",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "magazijnbeheersysteem",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Configuring and using software that tracks stock locations and warehouse tasks.",
+    "nl": "Software configureren en gebruiken die voorraadlocaties en magazijntaken opvolgt."
+   },
+   "related": [
+    "sap-logistics"
+   ]
+  },
+  {
+   "id": "sap-logistics",
+   "label": "SAP (logistics modules)",
+   "family": "logistics",
+   "aliases": [
+    {
+     "text": "SAP (logistics modules)",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "SAP",
+     "lang": "en",
+     "ambiguous": true
+    },
+    {
+     "text": "SAP MM",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "SAP WM",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "S/4HANA",
+     "lang": "en",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Working with the materials management and warehouse modules of SAP.",
+    "nl": "Werken met de modules voor materiaalbeheer en magazijn van SAP."
+   },
+   "related": [
+    "wms",
+    "inventory-management"
+   ]
+  },
+  {
+   "id": "inventory-management",
+   "label": "Inventory management",
+   "family": "logistics",
+   "aliases": [
+    {
+     "text": "inventory management",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "stock control",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "cycle counting",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "voorraadbeheer",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Keeping stock levels and stock records accurate.",
+    "nl": "Voorraadniveaus en voorraadgegevens juist houden."
+   },
+   "related": [
+    "sap-logistics",
+    "procurement"
+   ]
+  },
+  {
+   "id": "procurement",
+   "label": "Procurement",
+   "family": "logistics",
+   "aliases": [
+    {
+     "text": "procurement",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "purchasing",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "sourcing",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "aankoop",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "inkoop",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Selecting suppliers, comparing quotes and contracting goods and services.",
+    "nl": "Leveranciers selecteren, offertes vergelijken en goederen en diensten contracteren."
+   },
+   "related": [
+    "inventory-management",
+    "supply-chain-planning"
+   ]
+  },
+  {
+   "id": "supply-chain-planning",
+   "label": "Supply chain planning",
+   "family": "logistics",
+   "aliases": [
+    {
+     "text": "supply chain planning",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "demand planning",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "sales and operations planning",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "supply chain",
+     "lang": "en",
+     "ambiguous": true
+    },
+    {
+     "text": "vraagplanning",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Forecasting demand and aligning it with supply, production and stock.",
+    "nl": "De vraag voorspellen en afstemmen op aanvoer, productie en voorraad."
+   },
+   "related": [
+    "procurement",
+    "customs"
+   ]
+  },
+  {
+   "id": "customs",
+   "label": "Customs documentation",
+   "family": "logistics",
+   "aliases": [
+    {
+     "text": "customs documentation",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "customs",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Incoterms",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "douane",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "douanedocumenten",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Preparing import and export declarations and applying trade terms.",
+    "nl": "Invoer- en uitvoeraangiften opmaken en handelsvoorwaarden toepassen."
+   },
+   "related": [
+    "supply-chain-planning",
+    "route-planning"
+   ]
+  },
+  {
+   "id": "route-planning",
+   "label": "Transport and route planning",
+   "family": "logistics",
+   "aliases": [
+    {
+     "text": "Transport and route planning",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "route planning",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "transport planning",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "TMS",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "routeplanning",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "transportplanning",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Planning trucks, routes and delivery sequences.",
+    "nl": "Vrachtwagens, routes en de volgorde van leveringen plannen."
+   },
+   "related": [
+    "customs"
+   ]
+  },
+  {
+   "id": "b2b-sales",
+   "label": "B2B sales",
+   "family": "sales",
+   "aliases": [
+    {
+     "text": "B2B sales",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "business development",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "new business",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "prospecting",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "prospectie",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Finding and winning new business customers.",
+    "nl": "Nieuwe zakelijke klanten vinden en binnenhalen."
+   },
+   "related": [
+    "negotiation"
+   ]
+  },
+  {
+   "id": "negotiation",
+   "label": "Negotiation",
+   "family": "sales",
+   "aliases": [
+    {
+     "text": "negotiation",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "negotiating",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "onderhandelen",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "onderhandelingsvaardigheden",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Reaching agreements on price and terms while protecting the relationship.",
+    "nl": "Akkoorden bereiken over prijs en voorwaarden zonder de relatie te schaden."
+   },
+   "related": [
+    "b2b-sales",
+    "crm"
+   ]
+  },
+  {
+   "id": "crm",
+   "label": "CRM (Salesforce)",
+   "family": "sales",
+   "aliases": [
+    {
+     "text": "CRM (Salesforce)",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "CRM",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Salesforce",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "HubSpot",
+     "lang": "en",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Keeping customer contacts, opportunities and activities up to date in a CRM.",
+    "nl": "Klantcontacten, opportuniteiten en activiteiten bijhouden in een CRM."
+   },
+   "related": [
+    "negotiation",
+    "account-management"
+   ]
+  },
+  {
+   "id": "account-management",
+   "label": "Key account management",
+   "family": "sales",
+   "aliases": [
+    {
+     "text": "account management",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "key account management",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "key accounts",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "accountbeheer",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Managing and growing long-term relationships with important customers.",
+    "nl": "Langdurige relaties met belangrijke klanten beheren en laten groeien."
+   },
+   "related": [
+    "crm",
+    "customer-service"
+   ]
+  },
+  {
+   "id": "customer-service",
+   "label": "Customer service",
+   "family": "sales",
+   "aliases": [
+    {
+     "text": "customer service",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "customer support",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "klantendienst",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "klantenservice",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Answering customer questions and solving their problems by phone, email or chat.",
+    "nl": "Vragen van klanten beantwoorden en hun problemen oplossen via telefoon, e-mail of chat."
+   },
+   "related": [
+    "account-management",
+    "market-analysis"
+   ]
+  },
+  {
+   "id": "market-analysis",
+   "label": "Market analysis",
+   "family": "sales",
+   "aliases": [
+    {
+     "text": "market analysis",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "market research",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "competitor analysis",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "marktanalyse",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "marktonderzoek",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Studying competitors, prices and trends to inform commercial decisions.",
+    "nl": "Concurrenten, prijzen en trends bestuderen om commerciële beslissingen te onderbouwen."
+   },
+   "related": [
+    "customer-service",
+    "presentation-skills"
+   ]
+  },
+  {
+   "id": "presentation-skills",
+   "label": "Presentation skills",
+   "family": "sales",
+   "aliases": [
+    {
+     "text": "presentation skills",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "presenting",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "public speaking",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "presenteren",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "presentatievaardigheden",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Explaining ideas and products clearly to an audience.",
+    "nl": "Ideeën en producten helder uitleggen aan een publiek."
+   },
+   "related": [
+    "market-analysis"
+   ]
+  },
+  {
+   "id": "recruitment",
+   "label": "Recruitment",
+   "family": "hr",
+   "aliases": [
+    {
+     "text": "recruitment",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "recruiting",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "talent acquisition",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "rekrutering",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "werving",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Finding, interviewing and hiring candidates.",
+    "nl": "Kandidaten zoeken, interviewen en aanwerven."
+   },
+   "related": [
+    "labour-law"
+   ]
+  },
+  {
+   "id": "labour-law",
+   "label": "Belgian labour law",
+   "family": "hr",
+   "aliases": [
+    {
+     "text": "Belgian labour law",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "labour law",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "labor law",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "employment law",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "arbeidsrecht",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "sociaal recht",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "sociale wetgeving",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Applying employment contracts, dismissal rules and working-time law in Belgium.",
+    "nl": "Arbeidscontracten, ontslagregels en arbeidstijdwetgeving in België toepassen."
+   },
+   "related": [
+    "recruitment",
+    "payroll"
+   ]
+  },
+  {
+   "id": "payroll",
+   "label": "Payroll",
+   "family": "hr",
+   "aliases": [
+    {
+     "text": "payroll",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "payroll administration",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "salary administration",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "loonadministratie",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "personeelsadministratie",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Calculating and paying salaries correctly, including social security and tax.",
+    "nl": "Lonen correct berekenen en uitbetalen, met sociale zekerheid en belastingen."
+   },
+   "related": [
+    "labour-law",
+    "onboarding"
+   ]
+  },
+  {
+   "id": "onboarding",
+   "label": "Employee onboarding",
+   "family": "hr",
+   "aliases": [
+    {
+     "text": "onboarding",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "employee onboarding",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "inwerking",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "onthaal van nieuwe medewerkers",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Organising the first weeks of new employees so they become productive.",
+    "nl": "De eerste weken van nieuwe medewerkers organiseren zodat ze snel productief zijn."
+   },
+   "related": [
+    "payroll",
+    "performance-management"
+   ]
+  },
+  {
+   "id": "performance-management",
+   "label": "Performance management",
+   "family": "hr",
+   "aliases": [
+    {
+     "text": "performance management",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "performance reviews",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "evaluatiegesprekken",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "prestatiebeheer",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Running review cycles and helping managers give feedback and set goals.",
+    "nl": "Evaluatiecycli organiseren en managers helpen feedback te geven en doelen te stellen."
+   },
+   "related": [
+    "onboarding",
+    "coaching"
+   ]
+  },
+  {
+   "id": "coaching",
+   "label": "Coaching",
+   "family": "hr",
+   "aliases": [
+    {
+     "text": "coaching",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "mentoring",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "people development",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "coachen",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Helping people grow through questions, feedback and guidance.",
+    "nl": "Mensen laten groeien met vragen, feedback en begeleiding."
+   },
+   "related": [
+    "performance-management",
+    "hris"
+   ]
+  },
+  {
+   "id": "hris",
+   "label": "HR information systems",
+   "family": "hr",
+   "aliases": [
+    {
+     "text": "HR information systems",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "HRIS",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "HR information system",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Workday",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "SAP SuccessFactors",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "SuccessFactors",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Personio",
+     "lang": "en",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Maintaining employee records and HR workflows in HR software.",
+    "nl": "Personeelsgegevens en HR-workflows beheren in HR-software."
+   },
+   "related": [
+    "coaching"
+   ]
+  },
+  {
+   "id": "financial-reporting",
+   "label": "Financial reporting",
+   "family": "finance",
+   "aliases": [
+    {
+     "text": "financial reporting",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "month-end closing",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "year-end closing",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "financiële rapportering",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "maandafsluiting",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "jaarafsluiting",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Closing the books and reporting financial results to management.",
+    "nl": "De boeken afsluiten en financiële resultaten rapporteren aan het management."
+   },
+   "related": [
+    "budgeting"
+   ]
+  },
+  {
+   "id": "budgeting",
+   "label": "Budgeting",
+   "family": "finance",
+   "aliases": [
+    {
+     "text": "budgeting",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "budget control",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "forecasting",
+     "lang": "en",
+     "ambiguous": true
+    },
+    {
+     "text": "budgettering",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "budgetopvolging",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Preparing budgets and tracking actual spending against them.",
+    "nl": "Budgetten opstellen en de werkelijke uitgaven ertegen opvolgen."
+   },
+   "related": [
+    "financial-reporting",
+    "accounts-payable"
+   ]
+  },
+  {
+   "id": "accounts-payable",
+   "label": "Accounts payable",
+   "family": "finance",
+   "aliases": [
+    {
+     "text": "accounts payable",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "invoice processing",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "crediteurenbeheer",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "leveranciersboekhouding",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "factuurverwerking",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Checking, booking and paying supplier invoices.",
+    "nl": "Leveranciersfacturen controleren, boeken en betalen."
+   },
+   "related": [
+    "budgeting",
+    "ifrs"
+   ]
+  },
+  {
+   "id": "ifrs",
+   "label": "IFRS / Belgian GAAP",
+   "family": "finance",
+   "aliases": [
+    {
+     "text": "IFRS / Belgian GAAP",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "IFRS",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Belgian GAAP",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "BE GAAP",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "consolidation",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "consolidatie",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Applying international and Belgian accounting standards, including group consolidation.",
+    "nl": "Internationale en Belgische boekhoudnormen toepassen, inclusief consolidatie van de groep."
+   },
+   "related": [
+    "accounts-payable",
+    "financial-modelling"
+   ]
+  },
+  {
+   "id": "financial-modelling",
+   "label": "Financial modelling",
+   "family": "finance",
+   "aliases": [
+    {
+     "text": "financial modelling",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "financial modeling",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "business cases",
+     "lang": "en",
+     "ambiguous": true
+    },
+    {
+     "text": "financiële modellen",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Building models that project the financial outcome of decisions and investments.",
+    "nl": "Modellen bouwen die de financiële uitkomst van beslissingen en investeringen berekenen."
+   },
+   "related": [
+    "ifrs",
+    "excel"
+   ]
+  },
+  {
+   "id": "excel",
+   "label": "Advanced Excel",
+   "family": "finance",
+   "aliases": [
+    {
+     "text": "Excel",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "advanced Excel",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "MS Excel",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "pivot tables",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "VBA",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "draaitabellen",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Working with spreadsheets: lookups, pivot tables, macros and models.",
+    "nl": "Werken met rekenbladen: opzoekfuncties, draaitabellen, macro's en modellen."
+   },
+   "related": [
+    "financial-modelling",
+    "controlling"
+   ]
+  },
+  {
+   "id": "controlling",
+   "label": "Management control",
+   "family": "finance",
+   "aliases": [
+    {
+     "text": "controlling",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "management control",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "cost accounting",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "business controlling",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "kostprijsberekening",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Analysing costs and margins and explaining variances to managers.",
+    "nl": "Kosten en marges analyseren en afwijkingen verklaren aan managers."
+   },
+   "related": [
+    "excel"
+   ]
+  },
+  {
+   "id": "english",
+   "label": "English",
+   "family": "cross",
+   "aliases": [
+    {
+     "text": "English",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Engels",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Working in English, spoken and written.",
+    "nl": "Werken in het Engels, mondeling en schriftelijk."
+   },
+   "related": [
+    "dutch"
+   ]
+  },
+  {
+   "id": "dutch",
+   "label": "Dutch",
+   "family": "cross",
+   "aliases": [
+    {
+     "text": "Dutch",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Nederlands",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Working in Dutch, spoken and written.",
+    "nl": "Werken in het Nederlands, mondeling en schriftelijk."
+   },
+   "related": [
+    "english",
+    "french"
+   ]
+  },
+  {
+   "id": "french",
+   "label": "French",
+   "family": "cross",
+   "aliases": [
+    {
+     "text": "French",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Frans",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Working in French, spoken and written.",
+    "nl": "Werken in het Frans, mondeling en schriftelijk."
+   },
+   "related": [
+    "dutch",
+    "german"
+   ]
+  },
+  {
+   "id": "german",
+   "label": "German",
+   "family": "cross",
+   "aliases": [
+    {
+     "text": "German",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Duits",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Working in German, spoken and written.",
+    "nl": "Werken in het Duits, mondeling en schriftelijk."
+   },
+   "related": [
+    "french",
+    "stakeholder-management"
+   ]
+  },
+  {
+   "id": "stakeholder-management",
+   "label": "Stakeholder management",
+   "family": "cross",
+   "aliases": [
+    {
+     "text": "stakeholder management",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "managing stakeholders",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "stakeholdermanagement",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Keeping people with different interests informed, aligned and on board.",
+    "nl": "Mensen met verschillende belangen geïnformeerd, op één lijn en betrokken houden."
+   },
+   "related": [
+    "german",
+    "project-management"
+   ]
+  },
+  {
+   "id": "project-management",
+   "label": "Project management",
+   "family": "cross",
+   "aliases": [
+    {
+     "text": "project management",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "PRINCE2",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "PMP",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "projectmanagement",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "projectbeheer",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Planning work, tracking milestones and delivering projects on time and on budget.",
+    "nl": "Werk plannen, mijlpalen opvolgen en projecten op tijd en binnen budget opleveren."
+   },
+   "related": [
+    "stakeholder-management",
+    "agile"
+   ]
+  },
+  {
+   "id": "agile",
+   "label": "Agile / Scrum",
+   "family": "cross",
+   "aliases": [
+    {
+     "text": "Agile / Scrum",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Agile",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Scrum",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Kanban",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "Scrum Master",
+     "lang": "en",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Working in short iterations with a backlog, reviews and retrospectives.",
+    "nl": "Werken in korte iteraties met een backlog, reviews en retrospectives."
+   },
+   "related": [
+    "project-management",
+    "communication"
+   ]
+  },
+  {
+   "id": "communication",
+   "label": "Communication skills",
+   "family": "cross",
+   "aliases": [
+    {
+     "text": "communication skills",
+     "lang": "en",
+     "ambiguous": false
+    },
+    {
+     "text": "communicative",
+     "lang": "en",
+     "ambiguous": true
+    },
+    {
+     "text": "communicatievaardigheden",
+     "lang": "nl",
+     "ambiguous": false
+    },
+    {
+     "text": "communicatief",
+     "lang": "nl",
+     "ambiguous": false
+    }
+   ],
+   "definition": {
+    "en": "Expressing yourself clearly to colleagues, customers and management.",
+    "nl": "Je helder uitdrukken tegenover collega's, klanten en management."
+   },
+   "related": [
+    "agile"
+   ]
+  }
+ ]
+}

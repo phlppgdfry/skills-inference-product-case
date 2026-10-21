@@ -1,0 +1,189 @@
+openapi: 3.1.0
+info:
+  title: SkillDraft API
+  version: 1.0.0
+  description: |
+    Draft skill profiles from job descriptions, with evidence, for people to review.
+    Every suggested skill is a taxonomy id and points at the words it came from.
+    Errors follow RFC 9457 (application/problem+json). Job description text is never logged.
+servers:
+  - url: http://127.0.0.1:8080
+security:
+  - bearer: []
+paths:
+  /v1/skill-profiles:
+    post:
+      summary: Draft a skill profile for one job description
+      operationId: createSkillProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: {type: string, minLength: 1, maxLength: 20000}
+      responses:
+        "200":
+          description: Draft profile
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/SkillProfile"}
+        "401": {$ref: "#/components/responses/Problem"}
+        "413": {$ref: "#/components/responses/Problem"}
+        "422": {$ref: "#/components/responses/Problem"}
+  /v1/matches:
+    post:
+      summary: Rank people for a role profile (decision support, not a decision)
+      operationId: createMatches
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [skills, people]
+              properties:
+                skills:
+                  type: array
+                  items:
+                    type: object
+                    required: [id, importance]
+                    properties:
+                      id: {type: string}
+                      importance: {type: string, enum: [required, preferred]}
+                      status: {type: string, enum: [suggested, needs_review]}
+                      confidence: {type: number}
+                people:
+                  type: array
+                  maxItems: 5000
+                  items:
+                    type: object
+                    required: [id, skills]
+                    properties:
+                      id: {type: string}
+                      skills: {type: array, items: {type: string}}
+                limit: {type: integer, default: 20}
+      responses:
+        "200":
+          description: Ranked people with matched skills, gaps and gaps that are close to what they have
+        "401": {$ref: "#/components/responses/Problem"}
+        "422": {$ref: "#/components/responses/Problem"}
+  /v1/skills:
+    get:
+      summary: List or search the taxonomy
+      operationId: listSkills
+      parameters:
+        - {name: q, in: query, schema: {type: string}}
+      responses:
+        "200": {description: Skills}
+  /v1/skills/{id}:
+    get:
+      summary: One skill
+      operationId: getSkill
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: string}}
+      responses:
+        "200": {description: Skill}
+        "404": {$ref: "#/components/responses/Problem"}
+  /v1/feedback:
+    post:
+      summary: Record a reviewer's verdict on one skill of a profile
+      operationId: createFeedback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [request_id, skill_id, verdict]
+              properties:
+                request_id: {type: string}
+                skill_id: {type: string}
+                verdict: {type: string, enum: [accept, reject, add]}
+      responses:
+        "202": {description: Recorded}
+        "409": {$ref: "#/components/responses/Problem"}
+        "422": {$ref: "#/components/responses/Problem"}
+  /healthz:
+    get:
+      security: []
+      summary: Liveness
+      responses:
+        "200": {description: Alive}
+  /readyz:
+    get:
+      security: []
+      summary: Readiness, with the model and taxonomy versions
+      responses:
+        "200": {description: Ready}
+  /metrics:
+    get:
+      security: []
+      summary: Prometheus metrics
+      responses:
+        "200": {description: Metrics in the Prometheus text format}
+components:
+  securitySchemes:
+    bearer: {type: http, scheme: bearer}
+  responses:
+    Problem:
+      description: Problem details (RFC 9457)
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type: {type: string}
+              title: {type: string}
+              status: {type: integer}
+              detail: {type: string}
+              request_id: {type: string}
+  schemas:
+    SkillProfile:
+      type: object
+      required: [request_id, skills, uncovered_requirements, language_flags, meta]
+      properties:
+        request_id: {type: string}
+        skills:
+          type: array
+          items:
+            type: object
+            required: [id, label, status, importance, confidence, evidence]
+            properties:
+              id: {type: string, description: Taxonomy id}
+              label: {type: string}
+              status: {type: string, enum: [suggested, needs_review]}
+              importance: {type: string, enum: [required, preferred]}
+              confidence: {type: number, minimum: 0, maximum: 1, description: Calibrated probability that the skill belongs in the profile}
+              evidence:
+                type: array
+                minItems: 1
+                items:
+                  type: object
+                  required: [start, end, quote, kind, section]
+                  properties:
+                    start: {type: integer}
+                    end: {type: integer}
+                    quote: {type: string}
+                    kind: {type: string, enum: [exact, semantic]}
+                    section: {type: string}
+              verified_by: {type: string, description: Model id when the LLM verifier promoted the skill from review}
+        uncovered_requirements:
+          type: array
+          description: Requirement sentences that no skill explains; a signal for taxonomy gaps
+          items: {type: object}
+        language_flags:
+          type: array
+          description: Coded wording (age, gender, origin) with a neutral suggestion
+          items: {type: object}
+        meta:
+          type: object
+          properties:
+            config: {type: string}
+            taxonomy_version: {type: string}
+            embedder: {type: string}
+            model_version: {type: [string, "null"]}
+            language: {type: string}
+            latency_ms: {type: number}

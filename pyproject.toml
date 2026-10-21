@@ -1,0 +1,37 @@
+[project]
+name = "skilldraft"
+version = "1.0.0"
+description = "SkillDraft: draft skill profiles from job descriptions, with evidence, for people to review (portfolio case, fictional company)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = []  # the core runs on the standard library only
+
+[project.optional-dependencies]
+ml = ["torch>=2.4", "transformers>=4.45", "numpy>=1.26"]
+llm = ["anthropic>=1.0"]
+dev = ["ruff>=0.6", "bandit>=1.7", "pip-audit>=2.7"]
+
+[project.scripts]
+skilldraft = "skilldraft.__main__:main"
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["skilldraft*"]
+
+[tool.ruff]
+line-length = 160
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E731", "B905"]  # zip() pairs lists of known equal length throughout
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/make_data.py" = ["E501"]  # the taxonomy table reads best one skill per line
+
+[tool.bandit]
+exclude_dirs = ["tests"]
