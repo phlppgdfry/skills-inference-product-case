@@ -11,5 +11,6 @@
 | [0007](ADR-0007-evals-are-the-release-gate.md) | Evals are the release gate; docs quote generated numbers | Accepted |
 | [0008](ADR-0008-people-decide.md) | People decide: profiles are drafts, matches are lists | Accepted |
 | [0009](ADR-0009-personal-traits-are-never-evidence.md) | Sentences about age, gender or origin are never evidence | Accepted |
+| [0010](ADR-0010-person-profiles-mask-first.md) | Person profiles: mask personal data first, ask consent, never rank | Accepted (flagged) |
 
 Format: context, options, decision, consequences, how we would know it was wrong, when to revisit.

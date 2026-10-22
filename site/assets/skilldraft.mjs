@@ -12,12 +12,23 @@ const SECTION_KEYWORDS = [
   ["resp", [["your", "role"], ["responsibilities"], ["what", "you", "will", "do"], ["jouw", "rol"], ["takenpakket"], ["wat", "ga", "je", "doen"], ["functie"]]],
   ["about", [["about"], ["who", "we", "are"], ["over"], ["wie", "zijn", "we"], ["bedrijf"], ["company"]]],
 ];
-export const GOOD_SECTIONS = ["title", "resp", "req", "pref", "unknown"];
+export const GOOD_SECTIONS = ["title", "resp", "req", "pref", "unknown", "profile", "experience", "skills", "languages", "education"];
+const CV_SECTION_KEYWORDS = [
+  ["experience", [["experience"], ["work", "experience"], ["werkervaring"], ["ervaring"], ["employment"]]],
+  ["skills", [["skills"], ["vaardigheden"], ["competenties"]]],
+  ["languages", [["languages"], ["talen"]]],
+  ["education", [["education"], ["courses"], ["opleiding"], ["opleidingen"], ["certificates"]]],
+  ["profile", [["profile"], ["about", "me"], ["profiel"], ["over", "mij"], ["summary"]]],
+  ["interests", [["interests"], ["hobbies"], ["interesses"], ["hobby", "s"]]],
+];
+const ASPIRATION_CUES = [["would", "like", "to", "learn"], ["want", "to", "learn"], ["next", "step"], ["hope", "to"],
+  ["wil", "graag"], ["volgende", "stap"], ["wil", "leren"]];
+const JOB_LINE = /(?:19|20)\d{2}\s*[–-]\s*(?:(?:19|20)\d{2}|now|today|heden|nu)/;
 const PREFERRED_CUES = [["a", "plus"], ["bonus"], ["nice"], ["pluspunt"], ["troef"], ["meegenomen"], ["would", "be", "nice"]];
 const NEGATION_CUES = new Set(["no", "not", "t", "without", "never", "geen", "niet", "zonder", "hoeft", "nooit"]);
 const NEGATION_AFTER_CUES = new Set(["not", "t", "geen", "niet"]);
-const NEG_BEFORE = 4, NEG_AFTER = 3;
-const REQUIREMENT_NEGATIONS = [["not", "necessary"], ["not", "required"], ["no", "prior"], ["don", "t", "need"], ["geen", "vereiste"], ["niet", "nodig"], ["hoeft"]];
+const NEG_BEFORE = 5, NEG_AFTER = 3;
+const REQUIREMENT_NEGATIONS = [["no", "hands"], ["nog", "geen"], ["not", "necessary"], ["not", "required"], ["no", "prior"], ["don", "t", "need"], ["geen", "vereiste"], ["niet", "nodig"], ["hoeft"]];
 const YOU = new Set(["you", "your", "je", "jij", "jouw", "u"]);
 const WE = new Set(["we", "our", "us", "wij", "onze", "ons"]);
 const ASKS = new Set(["expect", "looking", "need", "require", "seek", "verwachten", "zoeken", "vragen"]);
@@ -51,15 +62,15 @@ function contains(words, seq) {
   return false;
 }
 
-function sectionOf(words) {
-  for (const [section, patterns] of SECTION_KEYWORDS) if (patterns.some((p) => contains(words, p))) return section;
+function sectionOf(words, table = SECTION_KEYWORDS) {
+  for (const [section, patterns] of table) if (patterns.some((p) => contains(words, p))) return section;
   return null;
 }
 
-function isHeading(line, words) {
+function isHeading(line, words, table) {
   const s = line.trim();
   if (!words.length || words.length > 6 || ".!?".includes(s.slice(-1)) && s.length) return null;
-  return sectionOf(words);
+  return sectionOf(words, table);
 }
 
 function splitLine(line, start) {
@@ -82,16 +93,18 @@ function voice(words) {
   return "neutral";
 }
 
-export function segment(text) {
+export function segment(text, kind = "jd") {
+  const cv = kind === "cv";
+  const table = cv ? CV_SECTION_KEYWORDS : SECTION_KEYWORDS;
   const folded = fold(text);
   const sentences = [];
-  let section = "unknown", seenHeading = false, pos = 0, firstLine = true;
+  let section = cv ? "header" : "unknown", seenHeading = false, pos = 0, firstLine = true;
   for (const line of text.split("\n")) {
     const start = pos;
     pos += line.length + 1;
     const words = tokenize(folded.slice(start, start + line.length)).map((t) => t.text);
     if (!words.length) continue;
-    const heading = isHeading(line, words);
+    const heading = isHeading(line, words, table);
     const trimmedEnd = start + line.replace(/\s+$/, "").length;
     if (heading) {
       section = heading; seenHeading = true;
@@ -100,7 +113,7 @@ export function segment(text) {
       firstLine = false;
       continue;
     }
-    if (firstLine && words.length <= 8 && !".!?".includes(line.trim().slice(-1))) {
+    if (firstLine && !cv && words.length <= 8 && !".!?".includes(line.trim().slice(-1))) {
       sentences.push({ index: sentences.length, start, end: trimmedEnd, text: line.trim(), tokens: tokenize(folded.slice(start, start + line.length), start), section: "title", heading: false, voice: "neutral" });
       firstLine = false;
       continue;
@@ -112,7 +125,7 @@ export function segment(text) {
       const w = toks.map((t) => t.text);
       sentences.push({
         index: sentences.length, start: a, end: b, text: text.slice(a, b), tokens: toks, section, heading: false,
-        voice: voice(w), preferredCue: PREFERRED_CUES.some((c) => contains(w, c)), offerCue: OFFER_CUES.some((c) => contains(w, c)),
+        voice: cv ? "neutral" : voice(w), aspiration: cv && ASPIRATION_CUES.some((c) => contains(w, c)), preferredCue: PREFERRED_CUES.some((c) => contains(w, c)), offerCue: OFFER_CUES.some((c) => contains(w, c)),
         contact: CONTACT_CUES.some((c) => contains(w, c)), requirementNegated: REQUIREMENT_NEGATIONS.some((c) => contains(w, c)),
       });
     }
@@ -230,6 +243,57 @@ export class HashingEmbedder {
   }
 }
 
+// ---------------------------------------------------------------- personal data (skilldraft/pii.py)
+export const MASK = "•";
+const PII_PATTERNS = [
+  ["email", /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g],
+  ["national_id", /\b\d{2}\.\d{2}\.\d{2}-\d{3}\.\d{2}\b/g],
+  ["birthdate", /\b\d{1,2}[/.-]\d{1,2}[/.-](?:19|20)\d{2}\b/g],
+  ["phone", /(?:\+32\s?|0)4\d{2}(?:[\s./]?\d{2}){3}\b|(?:\+32\s?|0)\d{1,2}(?:[\s./]?\d{2,3}){3}\b/g],
+  ["address", /\b[A-Z][a-zà-ÿ]+(?:straat|laan|weg|plein|steenweg|dreef|lei|kaai|street|road|avenue)\s\d{1,4}[a-z]?,?\s\d{4}\s[A-Z][a-zà-ÿ-]+/g],
+];
+const NAME_WORD = /^(?:[A-Z][a-zà-ÿ']+(?:-[A-Z][a-zà-ÿ']+)*|[Vv]an|[Dd]e|[Dd]er|[Ee]l|[Ll]e|[Bb]en)$/;
+
+function firstLineName(text) {
+  let pos = 0;
+  for (const line of text.split("\n")) {
+    if (line.trim()) {
+      const words = line.trim().split(/\s+/);
+      if (words.length >= 2 && words.length <= 4 && words.every((w) => NAME_WORD.test(w)) && /[A-Z]/.test(words[0][0])) {
+        const start = pos + line.length - line.replace(/^\s+/, "").length;
+        return [start, start + line.trim().length];
+      }
+      return null;
+    }
+    pos += line.length + 1;
+  }
+  return null;
+}
+
+export function maskPii(text) {
+  let spans = [];
+  const name = firstLineName(text);
+  if (name) {
+    const value = text.slice(name[0], name[1]);
+    let i = text.indexOf(value);
+    while (i >= 0) { spans.push({ kind: "name", start: i, end: i + value.length, rank: -1 }); i = text.indexOf(value, i + 1); }
+  }
+  PII_PATTERNS.forEach(([kind, re], rank) => { for (const m of text.matchAll(re)) spans.push({ kind, start: m.index, end: m.index + m[0].length, rank }); });
+  spans.sort((a, b) => a.start - b.start || a.rank - b.rank || b.end - a.end);
+  const merged = [];
+  for (const s of spans) {
+    if (merged.length && s.start < merged[merged.length - 1].end) { merged[merged.length - 1].end = Math.max(merged[merged.length - 1].end, s.end); continue; }
+    merged.push({ ...s });
+  }
+  const chars = [...text];
+  const counts = {};
+  for (const s of merged) {
+    for (let i = s.start; i < s.end; i++) if (!/\s/.test(chars[i])) chars[i] = MASK;
+    counts[s.kind] = (counts[s.kind] || 0) + 1;
+  }
+  return [chars.join(""), Object.fromEntries(Object.entries(counts).sort())];
+}
+
 // ---------------------------------------------------------------- coded language
 const LEXICON = [
   ["age", ["young", "and", "dynamic"], "Describe the team's way of working instead of its age: 'an energetic team that moves fast'."],
@@ -318,7 +382,8 @@ function importance(c) {
 }
 
 export class Pipeline {
-  constructor(taxonomyData, model) {
+  constructor(taxonomyData, model, kind = "jd") {
+    this.kind = kind;
     this.taxonomy = new Taxonomy(taxonomyData);
     this.model = model;
     this.embedder = new HashingEmbedder(model.min_similarity);
@@ -329,8 +394,8 @@ export class Pipeline {
   }
 
   analyse(text) {
-    const [sentences, hasHeadings] = segment(text);
-    const flagged = checkLanguage(text).map((f) => [f.start, f.end]);
+    const [sentences, hasHeadings] = segment(text, this.kind);
+    const flagged = this.kind === "jd" ? checkLanguage(text).map((f) => [f.start, f.end]) : [];
     const body = sentences.filter((s) => !s.heading && !flagged.some(([a, b]) => a < s.end && s.start < b));
     const vectors = this.embedder.encode(body.map((s) => s.text));
     const cands = new Map();
@@ -339,7 +404,7 @@ export class Pipeline {
       const section = effectiveSection(s);
       for (const h of this.taxonomy.match(s.tokens)) {
         get(h.skillId).evidence.push({ kind: "exact", start: h.start, end: h.end, sentence: s.index, section,
-          negated: negatedAt(s.tokens, h.first, h.last), ambiguous: h.ambiguous, similarity: 0, margin: 0, voice: s.voice });
+          negated: negatedAt(s.tokens, h.first, h.last) || !!s.aspiration, ambiguous: h.ambiguous, similarity: 0, margin: 0, voice: s.voice });
       }
       if (s.section === "title" || s.contact || !GOOD_SECTIONS.includes(section)) return;
       const sims = this.skillIds.map((id, k) => [this.embedder.similarity(vectors[i], this.skillVectors[k]), id])
@@ -349,7 +414,7 @@ export class Pipeline {
         if (sim < this.embedder.minSimilarity) break;
         const other = rank === 0 ? sims[1][0] : sims[0][0];
         get(id).evidence.push({ kind: "semantic", start: s.start, end: s.end, sentence: s.index, section,
-          negated: s.requirementNegated, ambiguous: false, similarity: r6(sim), margin: r6(sim - other), voice: s.voice });
+          negated: s.requirementNegated || !!s.aspiration, ambiguous: false, similarity: r6(sim), margin: r6(sim - other), voice: s.voice });
       }
     });
     for (const c of cands.values()) c.features = featureVector(c, hasHeadings, this.model.features);
@@ -357,8 +422,10 @@ export class Pipeline {
     return { text, sentences, hasHeadings, candidates: cands, excluded };
   }
 
-  infer(text) {
+  infer(rawText) {
     const t0 = performance.now();
+    let text = rawText, redactions = null;
+    if (this.kind === "cv") [text, redactions] = maskPii(rawText);
     const a = this.analyse(text);
     const m = this.model;
     const skills = [];
@@ -372,12 +439,19 @@ export class Pipeline {
       const live = c.evidence.filter((e) => !e.negated)
         .sort((x, y) => (x.kind !== "exact") - (y.kind !== "exact") || (!good(x)) - (!good(y)) || y.similarity - x.similarity || x.start - y.start);
       const s = this.taxonomy.byId[c.skillId];
-      skills.push({ id: c.skillId, label: s.label, status, importance: importance(c), confidence: Math.round(p * 1000) / 1000,
+      skills.push({ id: c.skillId, label: s.label, status, importance: this.kind === "cv" ? "held" : importance(c), confidence: Math.round(p * 1000) / 1000,
         evidence: live.slice(0, 3).map((e) => ({ start: e.start, end: e.end, quote: text.slice(e.start, e.end), kind: e.kind, section: e.section, sentence: e.sentence })) });
     }
     skills.sort((x, y) => (x.status !== "suggested") - (y.status !== "suggested") || (x.importance !== "required") - (y.importance !== "required")
       || y.confidence - x.confidence || (x.id < y.id ? -1 : x.id > y.id ? 1 : 0));
     const covered = new Set(skills.flatMap((s) => s.evidence.map((e) => e.sentence)));
+    const meta = { config: "D", taxonomy_version: this.taxonomy.version, embedder: this.embedder.name, model_version: m.version, kind: this.kind,
+      language: detectLanguage(text), latency_ms: Math.round((performance.now() - t0) * 100) / 100 };
+    if (this.kind === "cv") {
+      const unmapped = a.sentences.filter((s) => !s.heading && s.section === "experience" && !covered.has(s.index) && !s.requirementNegated && !s.aspiration && !JOB_LINE.test(s.text))
+        .map((s) => ({ start: s.start, end: s.end, text: s.text }));
+      return { skills, unmapped_sentences: unmapped, redactions, meta, masked_text: text };
+    }
     const uncovered = a.sentences.filter((s) => !s.heading && ["req", "resp"].includes(s.section) && !covered.has(s.index) && !s.requirementNegated && !a.excluded.has(s.index))
       .map((s) => ({ start: s.start, end: s.end, text: s.text }));
     return { skills, uncovered_requirements: uncovered, language_flags: checkLanguage(text),

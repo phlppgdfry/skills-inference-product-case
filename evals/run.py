@@ -32,10 +32,11 @@ sys.path.insert(0, str(ROOT))
 
 from skilldraft import make_embedder  # noqa: E402
 from skilldraft.match import ndcg_at_k, rank  # noqa: E402
+from skilldraft.pii import mask  # noqa: E402
 from skilldraft.pipeline import Pipeline  # noqa: E402
 from skilldraft.scorer import LogisticModel  # noqa: E402
 from skilldraft.taxonomy import Taxonomy  # noqa: E402
-from skilldraft.train import examples, load_jds, model_path  # noqa: E402
+from skilldraft.train import examples, load_cvs, load_jds, model_path  # noqa: E402
 
 REPORTS = ROOT / "evals" / "reports"
 THRESHOLDS = ROOT / "evals" / "thresholds.json"
@@ -237,6 +238,68 @@ def sweep(embedder_name: str = "hashing") -> dict:
     return {"embedder": emb.name, "split": "dev", "rule": "best F1 with invariance 1.0", "chosen": chosen, "rows": rows}
 
 
+def cv_suite(pipe: Pipeline, cvs: list[dict]) -> dict:
+    """Phase 2: skills of people from CVs. Same questions, plus: is personal data masked
+    everywhere, and does a different name or birth year change the profile?"""
+    tp = fp = fn = review_n = review_tp = pii_total = pii_masked = leaks = 0
+    by_lang: dict[str, list[int]] = defaultdict(lambda: [0, 0, 0])
+    by_surface: dict[str, list[int]] = defaultdict(lambda: [0, 0])
+    distract: dict[str, list[int]] = defaultdict(lambda: [0, 0])
+    ev_ok = ev_n = 0
+    base = {}
+    for cv in cvs:
+        out = pipe.infer(cv["text"])
+        base[cv["id"]] = signature(out)
+        gold = {g["id"]: g for g in cv["gold"]["skills"]}
+        sugg = {s["id"]: s for s in out["skills"] if s["status"] == "suggested"}
+        rev = {s["id"] for s in out["skills"] if s["status"] == "needs_review"}
+        t, f, n = len(sugg.keys() & gold.keys()), len(sugg.keys() - gold.keys()), len(gold.keys() - sugg.keys())
+        tp, fp, fn = tp + t, fp + f, fn + n
+        row = by_lang[cv["lang"]]
+        row[0], row[1], row[2] = row[0] + t, row[1] + f, row[2] + n
+        review_n += len(rev)
+        review_tp += len(rev & gold.keys())
+        for sid, g in gold.items():
+            by_surface[g["surface"]][0] += 1
+            by_surface[g["surface"]][1] += sid in sugg
+            if sid in sugg:
+                ev_n += 1
+                ev_ok += any(overlaps((e["start"], e["end"]), tuple(sp)) for e in sugg[sid]["evidence"] for sp in g["spans"])
+        for d in cv["gold"]["distractors"]:
+            distract[d["kind"]][0] += 1
+            distract[d["kind"]][1] += d["id"] in sugg
+        masked = mask(cv["text"])[0]
+        blob = json.dumps(out, ensure_ascii=False)
+        for g in cv["gold"]["pii"]:
+            pii_total += 1
+            pii_masked += all(c == "•" or c.isspace() for c in masked[g["start"]:g["end"]])
+            leaks += g["value"] in blob
+    rows = [json.loads(line) for line in (ROOT / "data" / "cv_counterfactuals.jsonl").read_text(encoding="utf-8").splitlines()]
+    per: dict[str, list[int]] = defaultdict(lambda: [0, 0])
+    for cf in rows:
+        if cf["base"] in base:
+            per[cf["kind"]][0] += 1
+            per[cf["kind"]][1] += signature(pipe.infer(cf["text"])) == base[cf["base"]]
+    res = {
+        "cvs": len(cvs), "gold_skills": tp + fn, "suggested": prf(tp, fp, fn),
+        "by_language": {k: prf(*v) for k, v in sorted(by_lang.items())},
+        "recall_by_surface": {k: round(v[1] / v[0], 4) for k, v in sorted(by_surface.items())},
+        "surface_counts": {k: v[0] for k, v in sorted(by_surface.items())},
+        "distractor_suggested_rate": {k: round(v[1] / v[0], 4) for k, v in sorted(distract.items())},
+        "distractor_counts": {k: v[0] for k, v in sorted(distract.items())},
+        "evidence_accuracy": round(ev_ok / ev_n, 4) if ev_n else 0.0,
+        "review": {"items": review_n, "per_cv": round(review_n / len(cvs), 2),
+                   "precision_in_band": round(review_tp / review_n, 4) if review_n else 0.0,
+                   "recall_with_review": round((tp + review_tp) / (tp + fn), 4) if tp + fn else 0.0},
+        "pii": {"spans": pii_total, "masked": round(pii_masked / pii_total, 4) if pii_total else 1.0, "leaks": leaks},
+        "invariance": round(sum(v[1] for v in per.values()) / sum(v[0] for v in per.values()), 4),
+        "invariance_by_kind": {k: round(v[1] / v[0], 4) for k, v in sorted(per.items())},
+        "variants": sum(v[0] for v in per.values()),
+    }
+    res["language_f1_gap"] = round(abs(res["by_language"]["en"]["f1"] - res["by_language"]["nl"]["f1"]), 4)
+    return res
+
+
 def build_report(embedder_name: str = "hashing", with_latency: bool = False) -> dict:
     tax = Taxonomy.load()
     emb = make_embedder(embedder_name)
@@ -257,6 +320,10 @@ def build_report(embedder_name: str = "hashing", with_latency: bool = False) -> 
     report["fairness"] = fairness(pipes["D"], test)
     report["language"] = language_checker(pipes["D"], load_jds())
     report["weights"] = dict(zip(model.features, model.weights)) | {"bias": model.bias}
+    cv_path = model_path(emb.name, "cv")
+    if cv_path.exists():
+        report["cv"] = cv_suite(Pipeline(tax, emb, LogisticModel.load(cv_path), "D", kind="cv"), load_cvs("test"))
+        report["cv"]["model_version"] = LogisticModel.load(cv_path).version
     if with_latency:
         report["latency"] = latency(pipes["D"], test)
     return report
@@ -278,9 +345,17 @@ def gate(report: dict) -> list[str]:
         "checker_false_alarms": report["language"]["false_alarms"],
         "p95_ms": report.get("latency", {}).get("p95_ms", 0.0),
     }
+    if "cv" in report:
+        cv = report["cv"]
+        actual |= {"cv_precision_suggested": cv["suggested"]["precision"], "cv_recall_with_review": cv["review"]["recall_with_review"],
+                   "cv_max_distractor_rate": max(cv["distractor_suggested_rate"].values()), "cv_pii_masked": cv["pii"]["masked"],
+                   "cv_pii_leaks": cv["pii"]["leaks"], "cv_invariance": cv["invariance"], "cv_evidence_accuracy": cv["evidence_accuracy"]}
     failures = []
     for key, rule in th.items():
         if key.startswith("_"):
+            continue
+        if key not in actual:
+            failures.append(f"{key}: not measured (missing model?)")
             continue
         v = actual[key]
         if ("min" in rule and v < rule["min"]) or ("max" in rule and v > rule["max"]):
@@ -300,6 +375,14 @@ def summary(r: dict) -> str:
     lines.append(f"D review band: {D['review']['per_description']} per description, recall with review {D['review']['recall_with_review']:.3f}")
     lines.append(f"calibration ECE {r['calibration']['ece']:.3f} · invariance {r['fairness']['invariance']:.3f} · "
                  f"EN/NL F1 gap {D['language_f1_gap']:.3f} · checker recall {r['language']['recall']:.3f} ({r['language']['false_alarms']} false alarms)")
+    if "cv" in r:
+        cv = r["cv"]
+        s = cv["suggested"]
+        dr = cv["distractor_suggested_rate"]
+        lines.append(f"CVs ({cv['cvs']}): precision {s['precision']:.3f} recall {s['recall']:.3f} f1 {s['f1']:.3f}"
+                     f" · described {cv['recall_by_surface'].get('paraphrase', 0):.3f}"
+                     f" · aspiration/negated suggested {dr.get('aspiration', 0):.2f}/{dr.get('negated', 0):.2f}"
+                     f" · personal data masked {cv['pii']['masked']:.3f}, leaks {cv['pii']['leaks']} · invariance {cv['invariance']:.3f}")
     if "latency" in r:
         lines.append(f"latency p50 {r['latency']['p50_ms']} ms · p95 {r['latency']['p95_ms']} ms")
     return "\n".join(lines)

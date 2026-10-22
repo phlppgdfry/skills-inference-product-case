@@ -5,6 +5,8 @@
     GET  /v1/skills           search the taxonomy (?q=)
     GET  /v1/skills/{id}      one skill
     POST /v1/feedback         reviewer verdict on one suggested skill (the training signal)
+    POST /v1/person-profiles  CV text → draft skills of a person, personal data masked (flag: person_profiles)
+    POST /v1/development-plans role skills + a person's skills → coverage and ordered gaps
     GET  /healthz /readyz /metrics
 
 Auth: Authorization: Bearer <key>, keys in SKILLDRAFT_API_KEYS (comma-separated). With
@@ -34,7 +36,8 @@ MAX_PEOPLE = 5_000
 VERDICTS = {"accept", "reject", "add"}
 ROUTES = [
     ("POST", "/v1/skill-profiles"), ("POST", "/v1/matches"), ("GET", "/v1/skills"), ("GET", "/v1/skills/{id}"),
-    ("POST", "/v1/feedback"), ("GET", "/healthz"), ("GET", "/readyz"), ("GET", "/metrics"),
+    ("POST", "/v1/feedback"), ("POST", "/v1/person-profiles"), ("POST", "/v1/development-plans"),
+    ("GET", "/healthz"), ("GET", "/readyz"), ("GET", "/metrics"),
 ]
 
 
@@ -45,7 +48,8 @@ class Problem(Exception):
 
 
 class App:
-    def __init__(self, pipeline=None, feedback_log: Path | None = None, api_keys: list[str] | None = None, env: str | None = None):
+    def __init__(self, pipeline=None, feedback_log: Path | None = None, api_keys: list[str] | None = None, env: str | None = None,
+                 person_profiles: bool | None = None):
         if pipeline is None:
             # SKILLDRAFT_VERIFIER=anthropic|bedrock sends the review band to Claude (skilldraft/llm.py)
             platform = os.environ.get("SKILLDRAFT_VERIFIER")
@@ -55,6 +59,12 @@ class App:
                 verifier = ClaudeVerifier(platform=platform)
             pipeline = default_pipeline(verifier=verifier)
         self.pipeline = pipeline
+        # Phase 2: person profiles are high-risk territory (docs/04-quality/ai-act.md). Off unless
+        # the flag is set; on by default only in dev.
+        if person_profiles is None:
+            person_profiles = os.environ.get("SKILLDRAFT_PERSON_PROFILES", "on" if os.environ.get("SKILLDRAFT_ENV") == "dev" else "off") == "on"
+        self.cv_pipeline = default_pipeline(kind="cv", embedder="hf" if self.pipeline.embedder.name.startswith("hf-") else "hashing") \
+            if person_profiles else None
         self.related = {s["id"]: s["related"] for s in self.pipeline.taxonomy.skills}
         keys = api_keys if api_keys is not None else [k for k in os.environ.get("SKILLDRAFT_API_KEYS", "").split(",") if k]
         self.api_keys = keys
@@ -85,6 +95,10 @@ class App:
             return 200, self.matches(body, request_id)
         if method == "POST" and path == "/v1/feedback":
             return 202, self.feedback(body, request_id)
+        if method == "POST" and path == "/v1/person-profiles":
+            return 200, self.person_profile(body, request_id)
+        if method == "POST" and path == "/v1/development-plans":
+            return 200, self.development_plan(body, request_id)
         if method == "GET" and path == "/v1/skills":
             q = (query.get("q") or [""])[0]
             items = self.pipeline.taxonomy.search(q) if q else self.pipeline.taxonomy.skills
@@ -121,6 +135,40 @@ class App:
         log("skill_profile", request_id=request_id, chars=len(text), **status_counts,
             uncovered=len(out["uncovered_requirements"]), model_version=out["meta"]["model_version"])
         return {"request_id": request_id, **out}
+
+    def person_profile(self, body: dict | None, request_id: str) -> dict:
+        if self.cv_pipeline is None:
+            raise Problem(404, "Not enabled", "Person profiles are off for this deployment (feature flag person_profiles)")
+        body = body or {}
+        text = body.get("text")
+        if body.get("consent") is not True:
+            raise Problem(422, "Consent required", "Set 'consent': true to confirm the person was informed and agreed (ADR-0010)")
+        if not isinstance(text, str) or not text.strip():
+            raise Problem(422, "Invalid request", "'text' must be a non-empty string")
+        if len(text) > MAX_TEXT:
+            raise Problem(413, "Text too long", f"At most {MAX_TEXT} characters")
+        with span("person_profile.infer", request_id, chars=len(text)):
+            out = self.cv_pipeline.infer(text)
+        for kind, n in out["redactions"].items():
+            METRICS.inc("skilldraft_redactions_total", n, kind=kind)
+        self._remember(request_id, {s["id"] for s in out["skills"]})
+        log("person_profile", request_id=request_id, chars=len(text), skills=len(out["skills"]),
+            redactions=sum(out["redactions"].values()), model_version=out["meta"]["model_version"])
+        return {"request_id": request_id, **out,
+                "note": "Draft for the person and HR to review. Personal data was masked before processing and is not stored."}
+
+    def development_plan(self, body: dict | None, request_id: str) -> dict:
+        from .development import plan
+
+        body = body or {}
+        role, person = body.get("role_skills"), body.get("person_skills")
+        if not isinstance(role, list) or not isinstance(person, list):
+            raise Problem(422, "Invalid request", "'role_skills' (list of {id, importance}) and 'person_skills' (list of ids) are required")
+        tax = self.pipeline.taxonomy.by_id
+        if any(not isinstance(s, dict) or s.get("id") not in tax or s.get("importance") not in ("required", "preferred") for s in role) \
+                or any(p not in tax for p in person):
+            raise Problem(422, "Invalid skill", "every skill must be a taxonomy id; role skills need importance 'required' or 'preferred'")
+        return {"request_id": request_id, **plan(role, person, self.pipeline.taxonomy)}
 
     def matches(self, body: dict | None, request_id: str) -> dict:
         body = body or {}

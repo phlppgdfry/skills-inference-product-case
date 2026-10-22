@@ -25,7 +25,7 @@ The opportunity is not "AI writes skill profiles". It is: **a draft profile that
 
 ## What we will not build first
 
-- An employee-side skills profile (inferring what a *person* can do). It is the more valuable product and the higher-risk one under the AI Act; it waits until the role side works ([ai-act.md](../04-quality/ai-act.md)).
+- An employee-side skills profile (inferring what a *person* can do) **as the first release**. It is the more valuable product and the higher-risk one under the AI Act. It is built second, behind a feature flag, with personal data masked before anything reads the CV ([ADR-0010](../03-decisions/ADR-0010-person-profiles-mask-first.md), [ai-act.md](../04-quality/ai-act.md)).
 - A free-text "skills generator". It produces words, not taxonomy skills, and every customer would get a different vocabulary ([spike report](../01-prototype/spike-report.md)).
 - Automated matching decisions. The match is a ranked list for a person to look at ([ADR-0008](../03-decisions/ADR-0008-people-decide.md)).
 

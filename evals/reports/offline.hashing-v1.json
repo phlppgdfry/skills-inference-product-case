@@ -357,5 +357,77 @@
   "company_voice": -0.749806,
   "no_headings": -0.517525,
   "bias": -1.729348
+ },
+ "cv": {
+  "cvs": 50,
+  "gold_skills": 482,
+  "suggested": {
+   "precision": 0.953,
+   "recall": 0.9253,
+   "f1": 0.9389,
+   "tp": 446,
+   "fp": 22,
+   "fn": 36
+  },
+  "by_language": {
+   "en": {
+    "precision": 0.954,
+    "recall": 0.9344,
+    "f1": 0.9441,
+    "tp": 228,
+    "fp": 11,
+    "fn": 16
+   },
+   "nl": {
+    "precision": 0.952,
+    "recall": 0.916,
+    "f1": 0.9336,
+    "tp": 218,
+    "fp": 11,
+    "fn": 20
+   }
+  },
+  "recall_by_surface": {
+   "alias": 0.9934,
+   "certificate": 1.0,
+   "label": 0.9718,
+   "paraphrase": 0.6559,
+   "title": 1.0
+  },
+  "surface_counts": {
+   "alias": 304,
+   "certificate": 8,
+   "label": 71,
+   "paraphrase": 93,
+   "title": 6
+  },
+  "distractor_suggested_rate": {
+   "aspiration": 0.0435,
+   "negated": 0.0
+  },
+  "distractor_counts": {
+   "aspiration": 23,
+   "negated": 16
+  },
+  "evidence_accuracy": 0.9978,
+  "review": {
+   "items": 90,
+   "per_cv": 1.8,
+   "precision_in_band": 0.1667,
+   "recall_with_review": 0.9564
+  },
+  "pii": {
+   "spans": 262,
+   "masked": 1.0,
+   "leaks": 0
+  },
+  "invariance": 1.0,
+  "invariance_by_kind": {
+   "age": 1.0,
+   "name": 1.0
+  },
+  "variants": 100,
+  "language_f1_gap": 0.0105,
+  "model_version": "scorer-dc86ec11"
  }
 }

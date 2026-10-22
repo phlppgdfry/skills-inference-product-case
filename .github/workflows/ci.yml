@@ -47,7 +47,9 @@ jobs:
       - name: Install CPU PyTorch and Transformers
         run: |
           pip install torch --index-url https://download.pytorch.org/whl/cpu
-          pip install "transformers>=4.45" numpy
+          pip install "transformers>=4.45" numpy "fastapi>=0.115" httpx
+      - name: FastAPI adapter answers like the stdlib server
+        run: python -m unittest tests.test_fastapi -v
       - name: PyTorch trainer matches the stdlib trainer
         run: |
           python -m unittest tests.test_torch_parity -v

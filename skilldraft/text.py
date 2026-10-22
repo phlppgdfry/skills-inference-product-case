@@ -24,7 +24,20 @@ SECTION_KEYWORDS: list[tuple[str, list[list[str]]]] = [
               ["wat", "ga", "je", "doen"], ["functie"]]),
     ("about", [["about"], ["who", "we", "are"], ["over"], ["wie", "zijn", "we"], ["bedrijf"], ["company"]]),
 ]
-GOOD_SECTIONS = ("title", "resp", "req", "pref", "unknown")
+GOOD_SECTIONS = ("title", "resp", "req", "pref", "unknown", "profile", "experience", "skills", "languages", "education")
+
+# CVs have their own sections. Lines before the first CV heading are the personal header.
+CV_SECTION_KEYWORDS: list[tuple[str, list[list[str]]]] = [
+    ("experience", [["experience"], ["work", "experience"], ["werkervaring"], ["ervaring"], ["employment"]]),
+    ("skills", [["skills"], ["vaardigheden"], ["competenties"]]),
+    ("languages", [["languages"], ["talen"]]),
+    ("education", [["education"], ["courses"], ["opleiding"], ["opleidingen"], ["certificates"]]),
+    ("profile", [["profile"], ["about", "me"], ["profiel"], ["over", "mij"], ["summary"]]),
+    ("interests", [["interests"], ["hobbies"], ["interesses"], ["hobby", "s"]]),
+]
+# "I would like to learn X" says what someone does not have yet.
+ASPIRATION_CUES = [["would", "like", "to", "learn"], ["want", "to", "learn"], ["next", "step"], ["hope", "to"],
+                   ["wil", "graag"], ["volgende", "stap"], ["wil", "leren"]]
 
 # A sentence that reads like a "nice to have" even without a heading.
 PREFERRED_CUES = [["a", "plus"], ["bonus"], ["nice"], ["pluspunt"], ["troef"], ["meegenomen"], ["would", "be", "nice"]]
@@ -34,10 +47,11 @@ NEGATION_CUES = {"no", "not", "t", "without", "never", "geen", "niet", "zonder",
 # After the alias only a predicate negates ("X is not needed", "X is geen vereiste");
 # "Python experience and no fear of change" does not.
 NEGATION_AFTER_CUES = {"not", "t", "geen", "niet"}
-NEG_BEFORE, NEG_AFTER = 4, 3
+NEG_BEFORE, NEG_AFTER = 5, 3
 # For semantic (whole-sentence) evidence only an explicit "not required" pattern negates,
 # because "without delays" or "never run out" do not negate the skill.
-REQUIREMENT_NEGATIONS = [["not", "necessary"], ["not", "required"], ["no", "prior"], ["don", "t", "need"], ["geen", "vereiste"], ["niet", "nodig"], ["hoeft"]]
+REQUIREMENT_NEGATIONS = [["no", "hands"], ["nog", "geen"], ["not", "necessary"], ["not", "required"], ["no", "prior"],
+                         ["don", "t", "need"], ["geen", "vereiste"], ["niet", "nodig"], ["hoeft"]]
 
 YOU = {"you", "your", "je", "jij", "jouw", "u"}
 WE = {"we", "our", "us", "wij", "onze", "ons"}
@@ -87,6 +101,7 @@ class Sentence:
     preferred_cue: bool = False
     offer_cue: bool = False
     contact: bool = False
+    aspiration: bool = False
     requirement_negated: bool = False
     meta: dict = field(default_factory=dict)
 
@@ -100,18 +115,18 @@ def contains(words: list[str], seq: list[str]) -> bool:
     return any(words[i:i + n] == seq for i in range(len(words) - n + 1))
 
 
-def section_of(words: list[str]) -> str | None:
-    for section, patterns in SECTION_KEYWORDS:
+def section_of(words: list[str], table=None) -> str | None:
+    for section, patterns in table or SECTION_KEYWORDS:
         if any(contains(words, p) for p in patterns):
             return section
     return None
 
 
-def is_heading(line: str, words: list[str]) -> str | None:
+def is_heading(line: str, words: list[str], table=None) -> str | None:
     stripped = line.strip()
     if not words or len(words) > 6 or stripped[-1:] in ".!?":
         return None
-    return section_of(words)
+    return section_of(words, table)
 
 
 def split_line(line: str, start: int) -> list[tuple[int, int]]:
@@ -132,14 +147,16 @@ def split_line(line: str, start: int) -> list[tuple[int, int]]:
     return out
 
 
-def segment(text: str) -> tuple[list[Sentence], bool]:
-    """Split a job description into sentences with a section label each.
+def segment(text: str, kind: str = "jd") -> tuple[list[Sentence], bool]:
+    """Split a job description (or a CV, kind="cv") into sentences with a section label each.
 
     Returns the sentences and whether the text had any recognised heading.
     """
+    cv = kind == "cv"
+    table = CV_SECTION_KEYWORDS if cv else None
     folded = fold(text)
     sentences: list[Sentence] = []
-    section = "unknown"
+    section = "header" if cv else "unknown"
     seen_heading = False
     pos = 0
     first_line = True
@@ -149,7 +166,7 @@ def segment(text: str) -> tuple[list[Sentence], bool]:
         words = [t.text for t in tokenize(folded[start:start + len(line)])]
         if not words:
             continue
-        heading = is_heading(line, words)
+        heading = is_heading(line, words, table)
         if heading:
             section, seen_heading = heading, True
             a = start + (len(line) - len(line.lstrip()))
@@ -157,7 +174,7 @@ def segment(text: str) -> tuple[list[Sentence], bool]:
                                       tokenize(folded[start:start + len(line)], start), heading, heading=True))
             first_line = False
             continue
-        if first_line and len(words) <= 8 and line.strip()[-1:] not in ".!?":
+        if first_line and not cv and len(words) <= 8 and line.strip()[-1:] not in ".!?":
             sentences.append(Sentence(len(sentences), start, start + len(line.rstrip()), line.strip(),
                                       tokenize(folded[start:start + len(line)], start), "title"))
             first_line = False
@@ -170,10 +187,11 @@ def segment(text: str) -> tuple[list[Sentence], bool]:
             words_s = [t.text for t in toks]
             sentences.append(Sentence(
                 len(sentences), a, b, text[a:b], toks, section,
-                voice=voice(words_s),
+                voice="neutral" if cv else voice(words_s),
                 preferred_cue=any(contains(words_s, c) for c in PREFERRED_CUES),
                 offer_cue=any(contains(words_s, c) for c in OFFER_CUES),
                 contact=any(contains(words_s, c) for c in CONTACT_CUES),
+                aspiration=cv and any(contains(words_s, c) for c in ASPIRATION_CUES),
                 requirement_negated=any(contains(words_s, c) for c in REQUIREMENT_NEGATIONS),
             ))
     return sentences, seen_heading

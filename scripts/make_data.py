@@ -9,6 +9,9 @@ What it writes
                                 evidence spans, distractors and coded-language flags
 - data/counterfactuals.jsonl    4 variants per dev and test description (he/she, name, age wording)
 - data/people.jsonl             60 employee skill profiles for the internal-mobility match
+- data/cvs.jsonl                160 fictional CVs (EN and NL) with gold skills, distractors ("I would
+                                like to learn X", "no experience with X yet") and personal-data spans
+- data/cv_counterfactuals.jsonl 2 variants per dev and test CV (other name, birth year 30 years apart)
 
 Why it is built this way
 - Gold labels come from the generator, not from the pipeline. The generator decides which skill
@@ -484,6 +487,184 @@ def people(rng: random.Random) -> list[dict]:
     return rows
 
 
+# ------------------------------------------------------------------ CVs (phase 2: people)
+# Fictional people. Names, streets, phone numbers and register numbers are generated; e-mail
+# addresses use the reserved .example domain. Two name groups make the counterfactual swap.
+FIRST = {"a": ["Pieter", "Sofie", "Jonas", "Lotte", "Wouter", "Hanne", "Bram", "Elke", "Thomas", "Lien"],
+         "b": ["Mohamed", "Fatima", "Yusuf", "Aisha", "Elif", "Karim", "Nadia", "Emre", "Samira", "Bilal"]}
+LAST = {"a": ["Claes", "Peeters", "Maes", "Janssens", "Wouters", "Vermeulen", "De Smet", "Lambrecht"],
+        "b": ["El Amrani", "Benali", "Yilmaz", "Diallo", "Kaya", "Bouzid", "Haddad", "Mensah"]}
+STREETS = ["Kerkstraat", "Stationsstraat", "Molenstraat", "Lindelaan", "Beukendreef", "Kapelleweg", "Marktplein", "Brusselsesteenweg"]
+CITIES = [("9000", "Gent"), ("8500", "Kortrijk"), ("2000", "Antwerpen"), ("8000", "Brugge"), ("3000", "Leuven"), ("9300", "Aalst")]
+EMPLOYERS = ["Vanbrabant Food", "Leiedal Metaal", "Scheldepoort Logistics", "Mosterdhuis Industries", "Haldane Group", "Kanaalzone Plastics"]
+CV_T = {
+    "en": {"profile": ["Profile", "About me"], "experience": ["Experience", "Work experience"], "skills": ["Skills"],
+           "languages": ["Languages"], "education": ["Education", "Courses"], "interests": ["Interests"],
+           "intro": "{title} with {n} years of experience.", "born": "Born ",  "nid": "National register number: ",
+           "bullet": ["- Worked daily with {a}.", "- Responsible for {a} at the {city} site.", "- Introduced {a} for a team of {n}."],
+           "aspire": ["I would like to learn {a}.", "Next step for me: a course in {a}."],
+           "neg": ["No hands-on experience with {a} yet."],
+           "cert": "Certificate: {a} ({y})", "degree": ["Professional bachelor in Electromechanics ({y})", "Bachelor in Business Administration ({y})", "Secondary school, technical track ({y})"],
+           "hobby": ["Cycling, cooking and photography.", "Running and board games."],
+           "level": {"native": "native", "fluent": "fluent", "good": "good"}},
+    "nl": {"profile": ["Profiel", "Over mij"], "experience": ["Werkervaring", "Ervaring"], "skills": ["Vaardigheden"],
+           "languages": ["Talen"], "education": ["Opleiding", "Opleidingen"], "interests": ["Interesses", "Hobby's"],
+           "intro": "{title} met {n} jaar ervaring.", "born": "Geboren op ", "nid": "Rijksregisternummer: ",
+           "bullet": ["- Werkte dagelijks met {a}.", "- Verantwoordelijk voor {a} op de site in {city}.", "- Voerde {a} in voor een team van {n}."],
+           "aspire": ["Ik wil graag {a} leren.", "Volgende stap voor mij: een opleiding {a}."],
+           "neg": ["Nog geen praktijkervaring met {a}."],
+           "cert": "Attest: {a} ({y})", "degree": ["Professionele bachelor Elektromechanica ({y})", "Bachelor Bedrijfsmanagement ({y})", "Secundair onderwijs, technische richting ({y})"],
+           "hobby": ["Fietsen, koken en fotografie.", "Lopen en gezelschapsspellen."],
+           "level": {"native": "moedertaal", "fluent": "vlot", "good": "goed"}},
+}
+
+
+def ascii_fold(s: str) -> str:
+    return "".join(c for c in unicodedata.normalize("NFKD", s) if not unicodedata.combining(c))
+
+
+def person(rng: random.Random, group: str) -> dict:
+    first, last = rng.choice(FIRST[group]), rng.choice(LAST[group])
+    year = rng.randint(1966, 2000)
+    month, day = rng.randint(1, 12), rng.randint(1, 28)
+    return {"name": f"{first} {last}", "email": ascii_fold(f"{first}.{last}").lower().replace(" ", "") + "@mail.example",
+            "street": f"{rng.choice(STREETS)} {rng.randint(1, 140)}", "city": rng.choice(CITIES),
+            "phone": f"04{rng.randint(70, 99)} {rng.randint(10, 99)} {rng.randint(10, 99)} {rng.randint(10, 99)}",
+            "born": (day, month, year), "nid_tail": f"{rng.randint(100, 999)}.{rng.randint(10, 99)}", "group": group}
+
+
+def header_lines(p: dict, lang: str, with_nid: bool) -> list[list[tuple[str, str | None]]]:
+    d, m, y = p["born"]
+    pc, city = p["city"]
+    lines = [[(p["name"], "name")],
+             [(f"{p['street']}, {pc} {city}", "address"), (" · ", None), (p["phone"], "phone"), (" · ", None), (p["email"], "email")],
+             [(CV_T[lang]["born"], None), (f"{d:02d}/{m:02d}/{y}", "birthdate")]]
+    if with_nid:
+        lines.append([(CV_T[lang]["nid"], None), (f"{y % 100:02d}.{m:02d}.{d:02d}-{p['nid_tail']}", "national_id")])
+    return lines
+
+
+def cv_paraphrase(rng: random.Random, sid: str, lang: str) -> str | None:
+    para = paraphrase(rng, sid, lang)
+    if not para:
+        return None
+    body = para.split(" ", 1)[1]  # drop "You" / "Je"
+    return "- " + body[0].upper() + body[1:]
+
+
+def make_cv(rng: random.Random, idx: int, split: str) -> dict:
+    lang = "nl" if rng.random() < 0.4 else "en"
+    fam = rng.choice(list(FAMILIES))
+    t = CV_T[lang]
+    p = person(rng, rng.choice("ab"))
+    core = [r[0] for r in SKILLS if r[2] == fam]
+    adjacent = [r[0] for r in SKILLS if r[2] in FAMILIES[fam]["adjacent"]]
+    held = rng.sample(core, rng.randint(4, min(7, len(core))))
+    listed = rng.sample([s for s in core + adjacent if s not in ("english", "dutch", "french", "german")], rng.randint(2, 3))
+    langs = rng.sample(["dutch", "english", "french", "german"], rng.randint(1, 3))
+    cert = rng.choice([s for s in core + adjacent]) if rng.random() < 0.35 else None
+    not_held = [s for s in core + adjacent if s not in held + listed + langs + [cert]]
+    aspire = rng.choice(not_held) if not_held and rng.random() < 0.5 else None
+    neg = rng.choice([s for s in not_held if s != aspire]) if rng.random() < 0.3 else None
+    d = Doc()
+    gold: dict[str, dict] = {}
+    pii: list[dict] = []
+
+    def add(sid: str, span: tuple[int, int], how: str) -> None:
+        g = gold.setdefault(sid, {"id": sid, "importance": "required", "spans": [], "surface": how})
+        g["spans"].append(list(span))
+
+    for parts in header_lines(p, lang, rng.random() < 0.25):
+        line = "".join(x for x, _ in parts)
+        start, _ = d.line(line, "header", "header", set())
+        pos = start
+        for text, kind in parts:
+            if kind:
+                pii.append({"kind": kind, "start": pos, "end": pos + len(text), "value": text})
+            pos += len(text)
+
+    def heading(key: str) -> None:
+        d.line(rng.choice(t[key]), "heading", key, set())
+
+    title = rng.choice(FAMILIES[fam][lang])
+    heading("profile")
+    span = d.line(t["intro"].format(title=title, n=rng.randint(2, 20)), "intro", "profile", skills_in(title))
+    for sid in skills_in(title):
+        add(sid, span, "title")
+    distractors = []
+    if aspire:
+        a = surface(rng, aspire, lang)[0]
+        span = d.line(rng.choice(t["aspire"]).format(a=a), "aspiration", "profile", {aspire})
+        distractors.append({"id": aspire, "kind": "aspiration", "span": list(span)})
+
+    heading("experience")
+    order = held[:]
+    rng.shuffle(order)
+    jobs = [order[: len(order) // 2], order[len(order) // 2:]]
+    year = 2026
+    for job in jobs:
+        y2, y1 = year, year - rng.randint(2, 6)
+        year = y1
+        jt = rng.choice(FAMILIES[fam][lang])
+        span = d.line(f"{jt} · {rng.choice(EMPLOYERS)} · {y1}–{y2}", "job", "experience", skills_in(jt))
+        for sid in skills_in(jt):
+            add(sid, span, "title")
+        for sid in job:
+            para = cv_paraphrase(rng, sid, lang)
+            if para and rng.random() < 0.35:
+                span = d.line(para, "paraphrase", "experience", set())
+                add(sid, span, "paraphrase")
+            else:
+                a, how = surface(rng, sid, lang)
+                span = d.line(rng.choice(t["bullet"]).format(a=a, city=p["city"][1], n=rng.randint(4, 15)), "mention", "experience", {sid})
+                add(sid, span, how)
+    if neg:
+        a = surface(rng, neg, lang)[0]
+        span = d.line(rng.choice(t["neg"]).format(a=a), "negated", "experience", {neg})
+        distractors.append({"id": neg, "kind": "negated", "span": list(span)})
+
+    heading("skills")
+    names = [surface(rng, sid, lang) for sid in listed]
+    line = ", ".join(n for n, _ in names)
+    span = d.line(line, "list", "skills", set(listed))
+    for sid, (_, how) in zip(listed, names):
+        add(sid, span, how)
+
+    heading("languages")
+    levels = list(t["level"].values())
+    parts = []
+    for sid in langs:
+        a = surface(rng, sid, lang)[0]
+        parts.append(f"{a} ({rng.choice(levels)})")
+    span = d.line(", ".join(parts), "list", "languages", set(langs))
+    for sid in langs:
+        add(sid, span, "alias")
+
+    heading("education")
+    d.line(rng.choice(t["degree"]).format(y=p["born"][2] + rng.randint(18, 23)), "degree", "education", set())
+    if cert:
+        a = surface(rng, cert, lang)[0]
+        span = d.line(t["cert"].format(a=a, y=rng.randint(max(2012, p["born"][2] + 20), 2025)), "cert", "education", {cert})
+        add(cert, span, "certificate")
+
+    heading("interests")
+    d.line(rng.choice(t["hobby"]), "hobby", "interests", set())
+    return {"id": f"CV-{idx:03d}", "split": split, "lang": lang, "family": fam, "text": d.text, "person": p,
+            "gold": {"skills": sorted(gold.values(), key=lambda g: g["id"]), "distractors": distractors, "pii": pii}}
+
+
+def cv_counterfactuals(cv: dict, rng: random.Random) -> list[dict]:
+    """Same CV, other person: a name from the other group, or a birth year 30 years apart."""
+    p = cv["person"]
+    other = person(rng, "b" if p["group"] == "a" else "a")
+    swapped = cv["text"].replace(p["name"], other["name"]).replace(p["email"], other["email"])
+    d, m, y = p["born"]
+    y2 = y - 30 if y >= 1996 else y + 30 if y <= 1970 else (1966 if y > 1983 else 1999)
+    aged = cv["text"].replace(f"{d:02d}/{m:02d}/{y}", f"{d:02d}/{m:02d}/{y2}").replace(f"{y % 100:02d}.{m:02d}.{d:02d}-", f"{y2 % 100:02d}.{m:02d}.{d:02d}-")
+    return [{"id": f"{cv['id']}-name", "base": cv["id"], "kind": "name", "split": cv["split"], "text": swapped},
+            {"id": f"{cv['id']}-age", "base": cv["id"], "kind": "age", "split": cv["split"], "text": aged}]
+
+
 def build() -> dict[str, str]:
     rng = random.Random(SEED)
     jds = []
@@ -497,6 +678,11 @@ def build() -> dict[str, str]:
         "counterfactuals.jsonl": "".join(json.dumps(c, ensure_ascii=False) + "\n" for c in cfs),
         "people.jsonl": "".join(json.dumps(p, ensure_ascii=False) + "\n" for p in people(rng)),
     }
+    rng_cv = random.Random(SEED + 7)  # separate stream: adding CVs leaves the job descriptions unchanged
+    cvs = [make_cv(rng_cv, i, "train" if i <= 80 else "dev" if i <= 110 else "test") for i in range(1, 161)]
+    ccf = [cf for cv in cvs if cv["split"] in ("dev", "test") for cf in cv_counterfactuals(cv, rng_cv)]
+    files["cvs.jsonl"] = "".join(json.dumps(c, ensure_ascii=False) + "\n" for c in cvs)
+    files["cv_counterfactuals.jsonl"] = "".join(json.dumps(c, ensure_ascii=False) + "\n" for c in ccf)
     return files
 
 
@@ -520,7 +706,7 @@ def main() -> int:
     jds = [json.loads(line) for line in files["job_descriptions.jsonl"].splitlines()]
     print(f"{'checked' if args.check else 'wrote'}: {len(json.loads(files['taxonomy.json'])['skills'])} skills, "
           f"{len(jds)} job descriptions, {files['counterfactuals.jsonl'].count(chr(10))} counterfactuals, "
-          f"{files['people.jsonl'].count(chr(10))} people")
+          f"{files['people.jsonl'].count(chr(10))} people, {files['cvs.jsonl'].count(chr(10))} CVs")
     return 0
 
 

@@ -30,12 +30,13 @@ sys.path.insert(0, str(ROOT))
 
 from evals.run import build_report, sweep  # noqa: E402
 from skilldraft import default_pipeline  # noqa: E402
+from skilldraft.cost import per_profile  # noqa: E402
 from skilldraft.embed import HashingEmbedder  # noqa: E402
 from skilldraft.llm import PROMPT_PATH, PROMPT_VERSION  # noqa: E402
 from skilldraft.pipeline import Pipeline  # noqa: E402
 from skilldraft.taxonomy import Taxonomy  # noqa: E402
 from skilldraft.text import detect_language  # noqa: E402
-from skilldraft.train import load_jds, model_path, train  # noqa: E402
+from skilldraft.train import load_cvs, load_jds, model_path, train  # noqa: E402
 
 MARKER = re.compile(r"<!--n:([\w.\-]+)-->(.*?)<!--/n-->", re.S)
 REPORTS = ROOT / "evals" / "reports"
@@ -101,6 +102,21 @@ def numbers(r: dict, sw: dict, hf: dict | None, hf_sweep: dict | None) -> dict[s
               "hf.invariance": pct(hf["fairness"]["invariance"]), "hf.D.review_per_jd": f"{D['review']['per_description']:.1f}"}
     if hf_sweep:
         n["hf.sweep.chosen"] = dec(hf_sweep["chosen"], 2)
+    cv = r["cv"]
+    s = cv["suggested"]
+    n |= {"cv.n": str(cv["cvs"]), "cv.gold": str(cv["gold_skills"]), "cv.precision": dec(s["precision"]), "cv.recall": dec(s["recall"]),
+          "cv.f1": dec(s["f1"]), "cv.paraphrase_recall": pct(cv["recall_by_surface"].get("paraphrase", 0.0)),
+          "cv.aspiration": pct(cv["distractor_suggested_rate"].get("aspiration", 0.0)), "cv.negated": pct(cv["distractor_suggested_rate"].get("negated", 0.0)),
+          "cv.pii_spans": str(cv["pii"]["spans"]), "cv.pii_masked": pct(cv["pii"]["masked"]), "cv.pii_leaks": str(cv["pii"]["leaks"]),
+          "cv.invariance": pct(cv["invariance"]), "cv.variants": str(cv["variants"]), "cv.evidence": pct(cv["evidence_accuracy"]),
+          "cv.review_per_cv": f"{cv['review']['per_cv']:.1f}", "cv.recall_with_review": dec(cv["review"]["recall_with_review"]),
+          "cv.f1_en": dec(cv["by_language"]["en"]["f1"]), "cv.f1_nl": dec(cv["by_language"]["nl"]["f1"]), "cv.model_version": cv["model_version"]}
+    jds = load_jds("test")
+    c = per_profile(sum(len(j["text"]) for j in jds) / len(jds), r["configs"]["D"]["review"]["per_description"])
+    n |= {"cost.tokens_in": str(c["tokens_in_per_call"]), "cost.tokens_out": str(c["tokens_out_per_call"]),
+          "cost.per_call": f"${c['usd_per_call']:.4f}", "cost.share": pct(c["share_of_profiles_with_a_call"]),
+          "cost.per_profile": f"${c['usd_per_profile']:.4f}", "cost.per_1400": f"${c['usd_per_profile'] * 1400:.2f}",
+          "cost.per_100k": f"${c['usd_per_profile'] * 100_000:,.0f}"}
     return n
 
 
@@ -117,13 +133,28 @@ def site_data(r: dict, sw: dict, hf: dict | None) -> dict[str, str]:
         out = pipe.infer(j["text"])
         parity.append({"id": j["id"], "skills": [[s["id"], s["status"], s["importance"], s["confidence"], s["evidence"][0]["start"]] for s in out["skills"]],
                        "uncovered": len(out["uncovered_requirements"]), "flags": len(out["language_flags"])})
-    evals = {k: r[k] for k in ("embedder", "model_version", "test_descriptions", "gold_skills", "thresholds", "configs", "calibration", "fairness", "language")}
+    cv_pipe = default_pipeline(kind="cv")
+    cv_parity = []
+    for cv in load_cvs("test"):
+        out = cv_pipe.infer(cv["text"])
+        skills = [[s["id"], s["status"], s["importance"], s["confidence"], s["evidence"][0]["start"]] for s in out["skills"]]
+        cv_parity.append({"id": cv["id"], "skills": skills,
+                          "unmapped": len(out["unmapped_sentences"]), "redactions": out["redactions"]})
+    cv_model = cv_pipe.model.to_json() | {"min_similarity": HashingEmbedder.min_similarity}
+    cv_samples = [{"id": f.stem, "title": "CV · " + ("NL" if detect_language(f.read_text(encoding="utf-8")) == "nl" else "EN"),
+                   "lang": detect_language(f.read_text(encoding="utf-8")), "text": f.read_text(encoding="utf-8").strip()}
+                  for f in sorted((ROOT / "data" / "samples" / "cv").glob("*.txt"))]
+    keys = ("embedder", "model_version", "test_descriptions", "gold_skills", "thresholds", "configs", "calibration", "fairness", "language", "cv")
+    evals = {k: r[k] for k in keys}
     evals["sweep"] = sw
     evals["hf"] = {k: hf[k] for k in ("embedder", "configs", "calibration", "fairness")} if hf else None
     dump = lambda o: json.dumps(o, ensure_ascii=False, separators=(",", ":")) + "\n"  # noqa: E731
     return {
         "site/data/taxonomy.json": (ROOT / "data" / "taxonomy.json").read_text(encoding="utf-8"),
         "site/data/model.json": json.dumps(model, indent=1) + "\n",
+        "site/data/model.cv.json": json.dumps(cv_model, indent=1) + "\n",
+        "site/data/cv_samples.json": dump(cv_samples),
+        "tests/js/parity.cv.json": dump(cv_parity),
         "site/data/samples.json": dump(samples),
         "site/data/evals.json": dump(evals),
         "tests/js/parity.json": dump(parity),
@@ -149,13 +180,17 @@ def main() -> int:
 
     model = train(Pipeline(Taxonomy.load(), HashingEmbedder(), None, config="C"))
     outputs[str(model_path("hashing-v1").relative_to(ROOT))] = json.dumps(model.to_json(), indent=1) + "\n"
+    cv_model = train(Pipeline(Taxonomy.load(), HashingEmbedder(), None, config="C", kind="cv"))
+    outputs[str(model_path("hashing-v1", "cv").relative_to(ROOT))] = json.dumps(cv_model.to_json(), indent=1) + "\n"
     sw = sweep("hashing")
     if sw["chosen"] != HashingEmbedder.min_similarity:
         problems.append(f"HashingEmbedder.min_similarity is {HashingEmbedder.min_similarity}, the dev sweep picks {sw['chosen']}")
     outputs["evals/reports/sweep.hashing-v1.json"] = json.dumps(sw, indent=1) + "\n"
 
-    if not args.check:  # the report below must read the model we just trained
-        model_path("hashing-v1").write_text(outputs[str(model_path("hashing-v1").relative_to(ROOT))], encoding="utf-8")
+    if not args.check:  # the report below must read the models we just trained
+        for kind in ("jd", "cv"):
+            path = model_path("hashing-v1", kind)
+            path.write_text(outputs[str(path.relative_to(ROOT))], encoding="utf-8")
     report = build_report("hashing")
     outputs["evals/reports/offline.hashing-v1.json"] = json.dumps(report, indent=1) + "\n"
 

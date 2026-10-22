@@ -14,16 +14,19 @@ Configurations, so the evals can show what each step buys (docs/01-prototype/spi
 from __future__ import annotations
 
 import math
+import re
 import time
 from dataclasses import dataclass, field
 
 from .embed import Embedder, HashingEmbedder
 from .inclusive import check as check_language
+from .pii import mask
 from .scorer import FEATURES, LogisticModel
 from .taxonomy import Taxonomy
 from .text import GOOD_SECTIONS, Sentence, detect_language, fold, negated_at, segment
 
 SEMANTIC_TOP_K = 2
+JOB_LINE = re.compile(r"(?:19|20)\d{2}\s*[–-]\s*(?:(?:19|20)\d{2}|now|today|heden|nu)")  # "Planner · Firm · 2019–2024"
 
 
 @dataclass
@@ -106,7 +109,11 @@ def importance(c: Candidate) -> str:
 
 class Pipeline:
     def __init__(self, taxonomy: Taxonomy, embedder: Embedder | None = None, model: LogisticModel | None = None,
-                 config: str = "D", semantic_threshold: float = 0.3, verifier=None, min_similarity: float | None = None):
+                 config: str = "D", semantic_threshold: float = 0.3, verifier=None, min_similarity: float | None = None,
+                 kind: str = "jd"):
+        if kind not in ("jd", "cv"):
+            raise ValueError("kind must be 'jd' (job description) or 'cv'")
+        self.kind = kind
         self.taxonomy = taxonomy
         self.embedder = embedder or HashingEmbedder()
         self.skill_ids = [s["id"] for s in taxonomy.skills]
@@ -123,19 +130,20 @@ class Pipeline:
 
     # ---------------------------------------------------------------- candidates
     def analyse(self, text: str) -> Analysis:
-        sentences, has_headings = segment(text)
+        sentences, has_headings = segment(text, self.kind)
         cands: dict[str, Candidate] = {}
         # A sentence about who the candidate is (age, gender, origin) is never evidence for
         # what they can do. Without this rule, "Je komt terecht in een jong en dynamisch team"
-        # was a weak semantic match for shift leadership and moved its score.
-        flagged = [(f["start"], f["end"]) for f in check_language(text)]
+        # was a weak semantic match for shift leadership and moved its score. (CVs are masked
+        # for personal data before they get here, see skilldraft/pii.py.)
+        flagged = [(f["start"], f["end"]) for f in check_language(text)] if self.kind == "jd" else []
         body = [s for s in sentences if not s.heading and not any(a < s.end and s.start < b for a, b in flagged)]
         vectors = self.embedder.encode([s.text for s in body]) if body else []
         for s, vec in zip(body, vectors):
             section = effective_section(s)
             for hit in self.taxonomy.match(s.tokens):
                 cands.setdefault(hit.skill_id, Candidate(hit.skill_id)).evidence.append(Evidence(
-                    "exact", hit.start, hit.end, s.index, section, negated_at(s.tokens, hit.first, hit.last),
+                    "exact", hit.start, hit.end, s.index, section, negated_at(s.tokens, hit.first, hit.last) or s.aspiration,
                     ambiguous=hit.ambiguous, voice=s.voice, alias=hit.alias))
             # Semantic matching only where the text talks about the job. Company talk, the offer
             # and contact lines can hold exact mentions (which the scorer learns to discount), but
@@ -149,7 +157,7 @@ class Pipeline:
                     break
                 other = sims[1][0] if rank == 0 else sims[0][0]
                 cands.setdefault(sid, Candidate(sid)).evidence.append(Evidence(
-                    "semantic", s.start, s.end, s.index, section, s.requirement_negated,
+                    "semantic", s.start, s.end, s.index, section, s.requirement_negated or s.aspiration,
                     similarity=round(sim, 6), margin=round(sim - other, 6), voice=s.voice))
         for c in cands.values():
             c.features = feature_vector(c, has_headings)
@@ -177,6 +185,8 @@ class Pipeline:
         t0 = time.perf_counter()
         if self.config == "A":
             return self._spike(text, t0)
+        if self.kind == "cv":
+            return self._infer_cv(text, t0)
         a = self.analyse(text)
         skills = []
         for c in a.candidates.values():
@@ -196,6 +206,23 @@ class Pipeline:
             "language_flags": check_language(text),
             "meta": self._meta(a.language, t0),
         }
+
+    def _infer_cv(self, text: str, t0: float) -> dict:
+        """A person's skills from their CV. Personal data is masked first; every quote in the
+        response comes from the masked text. Draft for the person and HR to review (ADR-0010)."""
+        masked, redactions = mask(text)
+        a = self.analyse(masked)
+        skills = []
+        for c in a.candidates.values():
+            status = self.decide(c)
+            if status:
+                skills.append(self._skill(a, c, status) | {"importance": "held"})
+        skills.sort(key=lambda s: (s["status"] != "suggested", -s["confidence"], s["id"]))
+        covered = {e["sentence"] for s in skills for e in s["evidence"]}
+        unmapped = [{"start": s.start, "end": s.end, "text": s.text} for s in a.sentences
+                    if not s.heading and s.section == "experience" and s.index not in covered
+                    and not s.requirement_negated and not s.aspiration and not JOB_LINE.search(s.text)]
+        return {"skills": skills, "unmapped_sentences": unmapped, "redactions": redactions, "meta": self._meta(a.language, t0)}
 
     def _skill(self, a: Analysis, c: Candidate, status: str) -> dict:
         s = self.taxonomy.by_id[c.skill_id]
@@ -246,6 +273,6 @@ class Pipeline:
     def _meta(self, language: str, t0: float) -> dict:
         return {
             "config": self.config, "taxonomy_version": self.taxonomy.version, "embedder": self.embedder.name,
-            "model_version": self.model.version if self.model and self.config == "D" else None,
+            "model_version": self.model.version if self.model and self.config == "D" else None, "kind": self.kind,
             "language": language, "latency_ms": round((time.perf_counter() - t0) * 1000, 2),
         }

@@ -1,14 +1,57 @@
 {
  "_comment": "Release gate for configuration D on the test split. Thresholds only go up; lowering one needs an ADR. See docs/04-quality/eval-plan.md.",
- "precision_suggested": {"min": 0.93},
- "recall_with_review": {"min": 0.93},
- "evidence_accuracy": {"min": 0.98},
- "importance_accuracy": {"min": 0.93},
- "max_distractor_rate": {"max": 0.10},
- "ece": {"max": 0.08},
- "invariance": {"min": 1.0},
- "language_f1_gap": {"max": 0.05},
- "checker_recall_known_phrases": {"min": 1.0},
- "checker_false_alarms": {"max": 0},
- "p95_ms": {"max": 250}
+ "precision_suggested": {
+  "min": 0.93
+ },
+ "recall_with_review": {
+  "min": 0.93
+ },
+ "evidence_accuracy": {
+  "min": 0.98
+ },
+ "importance_accuracy": {
+  "min": 0.93
+ },
+ "max_distractor_rate": {
+  "max": 0.1
+ },
+ "ece": {
+  "max": 0.08
+ },
+ "invariance": {
+  "min": 1.0
+ },
+ "language_f1_gap": {
+  "max": 0.05
+ },
+ "checker_recall_known_phrases": {
+  "min": 1.0
+ },
+ "checker_false_alarms": {
+  "max": 0
+ },
+ "p95_ms": {
+  "max": 250
+ },
+ "cv_precision_suggested": {
+  "min": 0.93
+ },
+ "cv_recall_with_review": {
+  "min": 0.9
+ },
+ "cv_max_distractor_rate": {
+  "max": 0.1
+ },
+ "cv_evidence_accuracy": {
+  "min": 0.95
+ },
+ "cv_pii_masked": {
+  "min": 1.0
+ },
+ "cv_pii_leaks": {
+  "max": 0
+ },
+ "cv_invariance": {
+  "min": 1.0
+ }
 }

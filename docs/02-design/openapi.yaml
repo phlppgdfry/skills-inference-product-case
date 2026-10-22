@@ -106,6 +106,55 @@ paths:
         "202": {description: Recorded}
         "409": {$ref: "#/components/responses/Problem"}
         "422": {$ref: "#/components/responses/Problem"}
+  /v1/person-profiles:
+    post:
+      summary: Draft the skills a person holds, from a CV (phase 2, behind the person_profiles flag)
+      description: |
+        Personal data (name, address, phone, e-mail, birth date, national register number) is masked
+        before any processing; quotes in the response come from the masked text. The person must have
+        been informed and agreed (consent). High-risk territory under the AI Act: a draft for the person
+        and HR to review, never a ranking.
+      operationId: createPersonProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text, consent]
+              properties:
+                text: {type: string, minLength: 1, maxLength: 20000}
+                consent: {type: boolean, const: true}
+      responses:
+        "200":
+          description: Draft person profile with evidence, unmapped experience sentences and redaction counts
+        "404": {$ref: "#/components/responses/Problem"}
+        "422": {$ref: "#/components/responses/Problem"}
+  /v1/development-plans:
+    post:
+      summary: Coverage of a role by a person's skills, and the gaps in a suggested learning order
+      operationId: createDevelopmentPlan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role_skills, person_skills]
+              properties:
+                role_skills:
+                  type: array
+                  items:
+                    type: object
+                    required: [id, importance]
+                    properties:
+                      id: {type: string}
+                      importance: {type: string, enum: [required, preferred]}
+                person_skills: {type: array, items: {type: string}}
+      responses:
+        "200":
+          description: Coverage, skills already held, and ordered gaps with the held skills they are close to
+        "422": {$ref: "#/components/responses/Problem"}
   /healthz:
     get:
       security: []

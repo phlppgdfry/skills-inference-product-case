@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkillDraft people</title>
+<meta name="description" content="Phase 2: draft a person's skills from a CV with personal data masked first, and a development plan towards a role. Runs in your browser.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../">Skill<span>Draft</span></a>
+  <nav><a href="../">Case</a><a href="../demo/">Demo</a><a href="./" aria-current="page">People</a><a href="../#evals">Evals</a></nav>
+</div></header>
+<main class="wrap">
+  <h1 style="font-size:32px;margin-top:28px">People: skills from a CV, and what to learn next</h1>
+  <p class="note">Phase 2, behind a feature flag in the product, because profiling people is high-risk under the AI Act. Personal data is masked <b>before</b> anything reads the CV; the profile is a draft for the person to check; the plan is a starting point for a conversation, never a ranking. Fictional CVs; nothing leaves your browser. Model <code id="model">…</code>.</p>
+  <div class="row" style="margin-top:12px">
+    <label for="sample" class="note">CV</label><select id="sample"></select>
+    <label for="role" class="note">Target role</label><select id="role"></select>
+  </div>
+  <div class="demo">
+    <section>
+      <textarea id="text" spellcheck="false" aria-label="CV text" style="min-height:300px"></textarea>
+      <p class="note" style="margin:10px 0 6px">What the pipeline actually reads (personal data masked):</p>
+      <div id="doc" class="doc" aria-live="polite"></div>
+    </section>
+    <section>
+      <div id="summary" class="note"></div>
+      <div id="skills" class="skills" style="margin-top:8px"></div>
+      <div id="extra"></div>
+      <h2 style="font-size:20px;margin:24px 0 6px">Development plan</h2>
+      <div id="plan"></div>
+    </section>
+  </div>
+  <div class="card" style="margin-top:24px">
+    <h3>Measured on <!--n:cv.n-->50<!--/n--> fictional test CVs</h3>
+    <p class="note" style="margin:0">Precision <!--n:cv.precision-->0.953<!--/n-->, recall <!--n:cv.recall-->0.925<!--/n-->; described experience found <!--n:cv.paraphrase_recall-->65.6%<!--/n-->; "I would like to learn X" suggested as a skill <!--n:cv.aspiration-->4.3%<!--/n-->; personal-data spans masked <!--n:cv.pii_masked-->100%<!--/n--> of <!--n:cv.pii_spans-->262<!--/n-->, values found in any response <!--n:cv.pii_leaks-->0<!--/n-->; profile unchanged with another name or a birth year 30 years apart <!--n:cv.invariance-->100%<!--/n-->. The masking patterns were written for these CVs; real CVs need their own test set (see EVIDENCE.md).</p>
+  </div>
+</main>
+<script type="module">
+import { Pipeline } from "../assets/skilldraft.mjs";
+
+const [taxonomy, model, cvModel, roles, cvs] = await Promise.all(["taxonomy", "model", "model.cv", "samples", "cv_samples"]
+  .map((n) => fetch(`../data/${n}.json`).then((r) => r.json())));
+const jdPipe = new Pipeline(taxonomy, model);
+const cvPipe = new Pipeline(taxonomy, cvModel, "cv");
+const tax = jdPipe.taxonomy;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+$("model").textContent = cvModel.version;
+for (const c of cvs) $("sample").insertAdjacentHTML("beforeend", `<option value="${c.id}">${esc(c.title)}</option>`);
+for (const r of roles) $("role").insertAdjacentHTML("beforeend", `<option value="${r.id}">${esc(r.title)} · ${r.lang.toUpperCase()}</option>`);
+let removed = new Set();
+
+// skilldraft/development.py, ported
+function plan(roleSkills, personSkills) {
+  const W = { required: 1, preferred: 0.5 };
+  const have = new Set(personSkills);
+  const role = roleSkills.filter((s) => s.status === "suggested");
+  const total = role.reduce((a, s) => a + W[s.importance], 0);
+  const covered = role.filter((s) => have.has(s.id)).reduce((a, s) => a + W[s.importance], 0);
+  const gaps = role.filter((s) => !have.has(s.id)).map((s) => {
+    const near = tax.byId[s.id].related.filter((r) => have.has(r)).sort();
+    return { id: s.id, label: tax.byId[s.id].label, importance: s.importance, near };
+  }).sort((a, b) => (a.importance !== "required") - (b.importance !== "required") || (!a.near.length) - (!b.near.length) || a.label.localeCompare(b.label));
+  return { coverage: total ? covered / total : 0, have: role.filter((s) => have.has(s.id)), gaps };
+}
+
+function run() {
+  const out = cvPipe.infer($("text").value);
+  const masked = out.masked_text;
+  // highlight evidence in the masked text
+  const marks = new Array(masked.length).fill("");
+  for (const s of out.skills) if (!removed.has(s.id)) for (const e of s.evidence) for (let i = e.start; i < e.end; i++) marks[i] = marks[i] === "exact" ? "exact" : (e.kind === "exact" ? (s.status === "suggested" ? "exact" : "review") : "semantic");
+  let html = "", i = 0;
+  while (i < masked.length) { let j = i; while (j < masked.length && marks[j] === marks[i]) j++; const t = esc(masked.slice(i, j)); html += marks[i] ? `<mark class="${marks[i]}">${t}</mark>` : t; i = j; }
+  $("doc").innerHTML = html;
+  const red = Object.entries(out.redactions).map(([k, v]) => `${k.replace("_", " ")} ${v}`).join(", ");
+  $("summary").innerHTML = `${out.skills.filter((s) => s.status === "suggested").length} skills · personal data masked: ${red || "none found"}`;
+  $("skills").innerHTML = out.skills.map((s) => `<div class="skill ${s.status === "needs_review" ? "review" : ""} ${removed.has(s.id) ? "rejected" : ""}" data-id="${s.id}">
+      <div><span class="name">${esc(s.label)}</span></div>
+      <div class="acts"><button data-id="${s.id}">${removed.has(s.id) ? "Undo" : "Not me"}</button></div>
+      <div class="meta">${s.status === "needs_review" ? '<span class="pill rev">please check</span>' : ""}confidence ${s.confidence.toFixed(2)} · “${esc(s.evidence[0].quote.slice(0, 70))}”</div></div>`).join("");
+  $("extra").innerHTML = out.unmapped_sentences.length ? `<h3 style="margin-top:16px">Experience not linked to a skill</h3><ul class="list">${out.unmapped_sentences.map((u) => `<li>${esc(u.text)}</li>`).join("")}</ul>` : "";
+  const role = roles.find((r) => r.id === $("role").value);
+  const roleProfile = jdPipe.infer(role.text).skills;
+  const person = out.skills.filter((s) => s.status === "suggested" && !removed.has(s.id)).map((s) => s.id);
+  const p = plan(roleProfile, person);
+  $("plan").innerHTML = `<p class="note">Coverage of <b>${esc(role.title)}</b>: ${(p.coverage * 100).toFixed(0)}% (required skills count double). Has: ${p.have.map((s) => esc(tax.byId[s.id].label)).join(", ") || "none yet"}.</p>
+    <ol class="list">${p.gaps.map((g) => `<li><b>${esc(g.label)}</b> <span class="pill ${g.importance === "required" ? "req" : "pref"}">${g.importance === "required" ? "required" : "nice to have"}</span>
+      ${g.near.length ? `close to ${g.near.map((r) => esc(tax.byId[r].label)).join(", ")}, which you already have` : "new for you"}</li>`).join("")}</ol>
+    <p class="note">A starting point for a development conversation, not an assessment: it says nothing about how well someone masters a skill.</p>`;
+}
+$("skills").addEventListener("click", (e) => { const id = e.target.closest("button")?.dataset.id; if (!id) return; removed.has(id) ? removed.delete(id) : removed.add(id); run(); });
+$("sample").onchange = () => { $("text").value = cvs.find((c) => c.id === $("sample").value).text; removed = new Set(); run(); };
+$("role").onchange = run;
+let timer;
+$("text").oninput = () => { clearTimeout(timer); timer = setTimeout(run, 150); };
+$("role").value = roles[0].id;
+$("sample").onchange();
+</script>
+</body>
+</html>

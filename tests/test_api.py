@@ -19,7 +19,7 @@ class ApiTest(unittest.TestCase):
     def setUpClass(cls):
         cls.tmp = tempfile.TemporaryDirectory()
         cls.log = Path(cls.tmp.name) / "feedback.jsonl"
-        cls.app = App(feedback_log=cls.log, api_keys=["secret-key"])
+        cls.app = App(feedback_log=cls.log, api_keys=["secret-key"], person_profiles=True)
         cls.httpd = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(cls.app))
         cls.base = f"http://127.0.0.1:{cls.httpd.server_address[1]}"
         threading.Thread(target=cls.httpd.serve_forever, daemon=True).start()
@@ -90,6 +90,28 @@ class ApiTest(unittest.TestCase):
         status, metrics, _ = self.call("GET", "/metrics", key=None)
         self.assertIn('skilldraft_http_requests_total{route="/v1/skill-profiles",status="200"}', metrics)
         self.assertIn("skilldraft_http_request_duration_ms_bucket", metrics)
+
+    def test_person_profile_needs_consent_and_hides_personal_data(self):
+        cv = ("Ann Peeters\nKerkstraat 12, 9000 Gent · 0478 12 34 56 · ann.peeters@mail.example\nExperience\n"
+              "- Worked daily with PLC programming.\nLanguages\nDutch (native)")
+        self.assertEqual(self.call("POST", "/v1/person-profiles", {"text": cv})[0], 422)
+        status, out, _ = self.call("POST", "/v1/person-profiles", {"text": cv, "consent": True})
+        self.assertEqual(status, 200)
+        self.assertIn("plc-programming", {s["id"] for s in out["skills"]})
+        self.assertNotIn("Peeters", json.dumps(out))
+        self.assertEqual(out["redactions"], {"address": 1, "email": 1, "name": 1, "phone": 1})
+
+    def test_person_profiles_off_by_default(self):
+        app = App(api_keys=["k"])
+        self.assertIsNone(app.cv_pipeline)
+
+    def test_development_plan(self):
+        body = {"role_skills": [{"id": "wms", "importance": "required"}, {"id": "forklift", "importance": "preferred"}],
+                "person_skills": ["inventory-management"]}
+        status, out, _ = self.call("POST", "/v1/development-plans", body)
+        self.assertEqual((status, out["coverage"]), (200, 0.0))
+        self.assertEqual([g["id"] for g in out["gaps"]], ["wms", "forklift"])
+        self.assertEqual(self.call("POST", "/v1/development-plans", {"role_skills": [], "person_skills": ["nope"]})[0], 422)
 
     def test_routes_match_the_openapi_contract(self):
         spec = (ROOT / "docs" / "02-design" / "openapi.yaml").read_text()

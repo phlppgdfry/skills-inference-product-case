@@ -53,6 +53,26 @@ curl -s localhost:8080/v1/matches -H 'Content-Type: application/json' -d '{
 }'
 ```
 
+## Draft a person's skills from a CV (phase 2, flag `person_profiles`)
+
+```bash
+curl -s localhost:8080/v1/person-profiles -H 'Content-Type: application/json' \
+  -d '{"text": "Ann Peeters\nExperience\n- Worked daily with PLC programming.", "consent": true}'
+```
+
+Without `"consent": true` the answer is `422`. Personal data is masked before processing; the response holds `skills` (with `importance: "held"`), `unmapped_sentences`, and `redactions` as counts per kind (for example `{"name": 1}`), never values. With the flag off the route answers `404`.
+
+## Development plan
+
+```bash
+curl -s localhost:8080/v1/development-plans -H 'Content-Type: application/json' -d '{
+  "role_skills": [{"id": "wms", "importance": "required"}, {"id": "forklift", "importance": "preferred"}],
+  "person_skills": ["inventory-management"]
+}'
+```
+
+Coverage (required skills count double), the role skills the person has, and the gaps in order: required first, then those next to a skill the person already holds.
+
 ## Errors
 
 RFC 9457 problem details, content type `application/problem+json`:

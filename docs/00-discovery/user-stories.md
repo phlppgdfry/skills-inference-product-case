@@ -82,6 +82,25 @@ And the response states that the ranking supports a decision and is not one
 ```
 Checked by: `tests/test_inclusive_match.py`, `tests/test_api.py::test_matches`.
 
+## Epic 5: People and development (phase 2, behind a flag)
+
+**US-5.1** As an employee, I want a draft of my skills from my CV that I can correct, so that internal opportunities can find me without me filling in a long form.
+
+```gherkin
+Given a CV in Dutch or English and my consent
+When the system drafts my skills
+Then my name, address, phone, e-mail, birth date and national register number are masked before any processing
+And no value of my personal data appears in the response
+And skills I only want to learn ("I would like to learn X") are not listed as skills I have
+And the same CV with another name or another birth year gives the same skills
+And precision of suggested skills is at least 0.93 on the CV testset
+```
+Checked by: `tests/test_person.py`, the CV suite in `evals/run.py` (gated).
+
+**US-5.2** As an employee, I want to see which skills a role needs that I do not have yet, starting with the ones closest to what I know, so that I can talk about a realistic next step with my manager.
+
+Checked by: `tests/test_person.py::DevelopmentPlanTest`, `POST /v1/development-plans`.
+
 ## Not in scope (and said so in the backlog)
 
-Inferring skills of *employees* from CVs or HR records; automated shortlisting; French job descriptions (taxonomy aliases first); importance on a 1–5 scale.
+Inferring skills from HR records other than a CV the person provides; proficiency levels; automated shortlisting; French job descriptions (taxonomy aliases first); importance on a 1–5 scale.

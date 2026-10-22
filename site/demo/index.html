@@ -10,7 +10,7 @@
 <body>
 <header class="top"><div class="wrap">
   <a class="brand" href="../">Skill<span>Draft</span></a>
-  <nav><a href="../">Case</a><a href="./" aria-current="page">Demo</a><a href="./?tour">Tour</a><a href="../#evals">Evals</a></nav>
+  <nav><a href="../">Case</a><a href="./" aria-current="page">Demo</a><a href="./?tour">Tour</a><a href="../people/">People</a><a href="../#evals">Evals</a></nav>
 </div></header>
 <main class="wrap">
   <h1 style="font-size:32px;margin-top:28px">Draft a skill profile</h1>
@@ -37,6 +37,12 @@
     <section>
       <div id="summary" class="note"></div>
       <div id="skills" class="skills" style="margin-top:8px"></div>
+      <div class="row" style="margin-top:10px">
+        <input id="addSkill" list="skillList" placeholder="Add a skill it missed…" aria-label="Add a skill"
+          style="flex:1;min-width:0;font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)">
+        <button id="addBtn" class="btn ghost" style="padding:8px 12px">Add</button>
+        <datalist id="skillList"></datalist>
+      </div>
       <div id="extra"></div>
       <details style="margin-top:14px"><summary class="note">What your verdicts would send to <code>/v1/feedback</code></summary><pre id="feedback" class="doc" style="font-size:12px"></pre></details>
     </section>
@@ -50,13 +56,21 @@ const [taxonomy, model, samples] = await Promise.all(["taxonomy", "model", "samp
 const pipe = new Pipeline(taxonomy, model);
 const $ = (id) => document.getElementById(id);
 const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-let mode = "D", active = null, verdicts = {}, last = null, gold = null;
+let mode = "D", active = null, verdicts = {}, last = null, gold = null, added = [];
 $("model").textContent = model.version;
+$("skillList").innerHTML = taxonomy.skills.map((s) => `<option value="${esc(s.label)}"></option>`).join("");
+$("addBtn").onclick = () => {
+  const label = $("addSkill").value.trim().toLowerCase();
+  const s = taxonomy.skills.find((x) => x.label.toLowerCase() === label || x.aliases.some((a) => a.text.toLowerCase() === label));
+  if (!s || last.skills.some((x) => x.id === s.id) || added.includes(s.id)) { $("addSkill").value = ""; return; }
+  added.push(s.id); verdicts[s.id] = "add"; $("addSkill").value = ""; render($("text").value, last);
+};
+$("addSkill").onkeydown = (e) => { if (e.key === "Enter") $("addBtn").click(); };
 
 for (const s of samples) $("sample").insertAdjacentHTML("beforeend", `<option value="${s.id}">${esc(s.title)} · ${s.lang.toUpperCase()}${s.gold ? " · test set" : ""}</option>`);
 function load(id) {
   const s = samples.find((x) => x.id === id);
-  $("sample").value = id; $("text").value = s.text; gold = s.gold; verdicts = {}; active = null; run();
+  $("sample").value = id; $("text").value = s.text; gold = s.gold; verdicts = {}; added = []; active = null; run();
 }
 $("sample").onchange = (e) => load(e.target.value);
 let timer;
@@ -124,7 +138,11 @@ function render(text, out) {
       <div class="meta"><span class="pill ${s.importance === "required" ? "req" : "pref"}">${s.importance === "required" ? "required" : "nice to have"}</span>${s.status === "needs_review" ? '<span class="pill rev">please check</span>' : ""}
         confidence ${s.confidence.toFixed(2)} · ${ev.kind === "semantic" ? "described" : "named"}: “${esc(ev.quote.slice(0, 70))}${ev.quote.length > 70 ? "…" : ""}”${g}</div>
     </div>`;
-  }).join("") || `<p class="note">No skills found.</p>`;
+  }).join("") + added.map((id) => `<div class="skill" data-id="${id}" style="border-left-color:var(--sem)">
+      <div><span class="name">${esc(pipe.taxonomy.byId[id].label)}</span></div>
+      <div class="acts"><button data-v="add" aria-label="Remove what you added">✕</button></div>
+      <div class="meta"><span class="pill">added by you</span> sent as <code>verdict: "add"</code>, the training signal for what the model missed</div>
+    </div>`).join("") || `<p class="note">No skills found.</p>`;
 
   let extra = "";
   if (goldIds) {
@@ -141,6 +159,7 @@ $("skills").addEventListener("click", (e) => {
   const card = e.target.closest(".skill");
   if (!card) return;
   const v = e.target.closest("button")?.dataset.v;
+  if (v === "add") { added = added.filter((x) => x !== card.dataset.id); delete verdicts[card.dataset.id]; render($("text").value, last); return; }
   if (v) verdicts[card.dataset.id] = verdicts[card.dataset.id] === v ? undefined : v;
   else active = active === card.dataset.id ? null : card.dataset.id;
   for (const k of Object.keys(verdicts)) if (!verdicts[k]) delete verdicts[k];

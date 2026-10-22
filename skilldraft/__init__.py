@@ -17,7 +17,7 @@ def make_embedder(name: str = "hashing"):
     raise ValueError(f"unknown embedder {name!r}")
 
 
-def default_pipeline(config: str = "D", embedder: str = "hashing", verifier=None):
+def default_pipeline(config: str = "D", embedder: str = "hashing", verifier=None, kind: str = "jd"):
     """The production pipeline: taxonomy + embedder + the trained scorer for that embedder."""
     from .pipeline import Pipeline
     from .scorer import LogisticModel
@@ -27,8 +27,8 @@ def default_pipeline(config: str = "D", embedder: str = "hashing", verifier=None
     emb = make_embedder(embedder)
     model = None
     if config == "D":
-        path = model_path(emb.name)
+        path = model_path(emb.name, kind)
         if not Path(path).exists():
             raise FileNotFoundError(f"{path} is missing: run python -m skilldraft train --embedder {embedder}")
         model = LogisticModel.load(path)
-    return Pipeline(Taxonomy.load(), emb, model, config=config, verifier=verifier)
+    return Pipeline(Taxonomy.load(), emb, model, config=config, verifier=verifier, kind=kind)

@@ -10,7 +10,7 @@ HR business partners need reviewed skill profiles for 1,400 roles ([problem brie
 
 **Goals:** draft profile per job description with taxonomy ids, importance, confidence and evidence; review band; feedback capture; coded-language flags; EN and NL; p95 < 250 ms in process; deterministic.
 
-**Non-goals (v1):** employee skill inference, automated shortlisting, French, a UI beyond the demo, multi-tenant taxonomy customisation.
+**Non-goals (v1):** employee skill inference as a released feature (built behind a flag as phase 2, [ADR-0010](../03-decisions/ADR-0010-person-profiles-mask-first.md)), automated shortlisting, French, a UI beyond the demo, multi-tenant taxonomy customisation.
 
 ## Design
 
@@ -46,12 +46,15 @@ flowchart LR
 | Verifier | `skilldraft/llm.py` | Judge the review band, schema-constrained, grounded quotes | Platform: Claude API or Bedrock |
 | Checker | `skilldraft/inclusive.py` | Coded wording with suggestions | Lexicon versioned with the taxonomy |
 | Match | `skilldraft/match.py` | Rank people, gaps, close-to-learn | Phase 2, behind a flag |
-| API | `skilldraft/api.py` | HTTP, auth, limits, problem details, feedback | Framework can change; contract cannot |
+| Personal data | `skilldraft/pii.py` | Mask name, address, phone, e-mail, birth date, national id before a CV is read | Patterns → NER model later |
+| Development | `skilldraft/development.py` | Coverage and ordered gaps for one person and one role | Phase 2, behind a flag |
+| Cost | `skilldraft/cost.py` | Verifier cost per profile from the review band | Prices per platform |
+| API | `skilldraft/api.py`, `adapters/fastapi_app.py` | HTTP, auth, limits, problem details, feedback; the same logic on FastAPI | Framework can change; contract cannot |
 | Obs | `skilldraft/obs.py` | JSON logs, metrics, spans | Exporter can change |
 
 ### Key decisions
 
-[ADR index](../03-decisions/README.md). In short: output only taxonomy ids (0001); the LLM verifies and never invents (0002); calibrated score with a review band (0003); no skill without evidence (0004); standard-library core with optional heavy adapters (0005); Bedrock for EU customers (0006); evals are the release gate (0007); people decide (0008); sentences about personal traits are never evidence (0009).
+[ADR index](../03-decisions/README.md). In short: output only taxonomy ids (0001); the LLM verifies and never invents (0002); calibrated score with a review band (0003); no skill without evidence (0004); standard-library core with optional heavy adapters (0005); Bedrock for EU customers (0006); evals are the release gate (0007); people decide (0008); sentences about personal traits are never evidence (0009); person profiles mask personal data first, ask consent and never rank (0010).
 
 ## API
 

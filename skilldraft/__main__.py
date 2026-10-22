@@ -22,7 +22,7 @@ def _read(path: str) -> str:
 
 
 def cmd_infer(args) -> int:
-    pipe = default_pipeline(args.config, args.embedder)
+    pipe = default_pipeline(args.config, args.embedder, kind=args.kind)
     out = pipe.infer(_read(args.file))
     if args.json:
         print(json.dumps(out, ensure_ascii=False, indent=1))
@@ -31,9 +31,11 @@ def cmd_infer(args) -> int:
         mark = "✓" if s["status"] == "suggested" else "?"
         quote = s["evidence"][0]["quote"] if s["evidence"] else ""
         print(f"{mark} {s['label']:<34} {s['importance']:<9} {s['confidence']:.2f}  “{quote[:60]}”")
-    for u in out["uncovered_requirements"]:
+    for u in out.get("uncovered_requirements", out.get("unmapped_sentences", [])):
         print(f"· not mapped to the taxonomy: “{u['text'][:80]}”")
-    for f in out["language_flags"]:
+    if "redactions" in out:
+        print("· personal data masked: " + ", ".join(f"{k} {v}" for k, v in out["redactions"].items()))
+    for f in out.get("language_flags", []):
         print(f"! {f['category']}: “{f['quote']}”: {f['suggestion']}")
     print(json.dumps(out["meta"]))
     return 0
@@ -61,8 +63,8 @@ def cmd_train(args) -> int:
     from .train import model_path, train
 
     emb = make_embedder(args.embedder)
-    model = train(Pipeline(Taxonomy.load(), emb, None, config="C"))
-    path = model_path(emb.name)
+    model = train(Pipeline(Taxonomy.load(), emb, None, config="C", kind=args.kind))
+    path = model_path(emb.name, args.kind)
     model.save(path)
     print(f"wrote {path.relative_to(Path.cwd()) if path.is_relative_to(Path.cwd()) else path}: {model.version}, "
           f"accept ≥ {model.accept_at}, review ≥ {model.review_at}")
@@ -83,6 +85,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--config", default="D", choices=list("ABCD"))
     p.add_argument("--embedder", default="hashing")
     p.add_argument("--json", action="store_true")
+    p.add_argument("--kind", default="jd", choices=["jd", "cv"], help="job description or CV")
     p.set_defaults(fn=cmd_infer)
     p = sub.add_parser("match")
     p.add_argument("jd")
@@ -90,6 +93,7 @@ def main(argv: list[str] | None = None) -> int:
     p.set_defaults(fn=cmd_match)
     p = sub.add_parser("train")
     p.add_argument("--embedder", default="hashing")
+    p.add_argument("--kind", default="jd", choices=["jd", "cv"])
     p.set_defaults(fn=cmd_train)
     p = sub.add_parser("serve")
     p.add_argument("--host", default="127.0.0.1")

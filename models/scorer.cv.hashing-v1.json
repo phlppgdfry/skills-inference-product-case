@@ -1,0 +1,35 @@
+{
+ "version": "scorer-dc86ec11",
+ "embedder": "hashing-v1",
+ "features": [
+  "exact_good",
+  "exact_bad",
+  "negated",
+  "sem_good",
+  "sem_margin",
+  "ambiguous_only",
+  "mentions",
+  "in_pref",
+  "in_title",
+  "company_voice",
+  "no_headings"
+ ],
+ "weights": [
+  4.971239,
+  0.0,
+  -1.074407,
+  2.303922,
+  4.708899,
+  0.0009,
+  2.111114,
+  0.0,
+  0.0,
+  0.0,
+  0.0
+ ],
+ "bias": -3.162706,
+ "accept_at": 0.31,
+ "review_at": 0.155,
+ "l2": 0.001,
+ "trained_on": "train split: 38e7a95fe576"
+}
