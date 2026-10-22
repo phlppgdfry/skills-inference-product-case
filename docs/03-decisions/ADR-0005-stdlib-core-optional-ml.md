@@ -3,7 +3,7 @@
 **Status:** Accepted
 
 ## Context
-The service must start in milliseconds, run in CI without GPUs or downloads, and run in a browser for the demo. The vacancy-level skills (PyTorch, Transformers, an LLM) must still be first-class.
+The service must start in milliseconds, run in CI without GPUs or downloads, and run in a browser for the demo. The team's ML stack (PyTorch, Transformers, an LLM) must still be first-class.
 
 ## Decision
 - Core on the Python standard library: text, taxonomy, hashing embedder, scorer, API, evals.

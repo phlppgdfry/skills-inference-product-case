@@ -4,6 +4,8 @@
 
 [![CI](https://github.com/phlppgdfry/skills-inference-product-case/actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
 
+**Live site:** [phlppgdfry.github.io/skills-inference-product-case](https://phlppgdfry.github.io/skills-inference-product-case/), with a guided [demo tour](https://phlppgdfry.github.io/skills-inference-product-case/demo/?tour) and the [People view](https://phlppgdfry.github.io/skills-inference-product-case/people/).
+
 > Fictional setting. Orveda (an HR-tech scale-up) and Haldane Group (an industrial customer) are invented; the interviews are synthetic and the job descriptions are generated. Every number below comes from the eval suite and is rewritten by `scripts/build.py`, so no page can quote a stale one. [EVIDENCE.md](EVIDENCE.md) separates what is executed, simulated and not done.
 
 ## The answer in one paragraph
